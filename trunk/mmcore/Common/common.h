@@ -283,41 +283,37 @@ void	Com_free(void *ptr);
 
 
 
-#define __COM_CNT_BIT__(_n)		((_n) * CHAR_BIT)
-
-#define COM_BYTEFLIP_16(_v)		( (((uint_16_t)(_v) >> __COM_CNT_BIT__(1)) & 0x00FF)								\
-								| (((uint_16_t)(_v) << __COM_CNT_BIT__(1)) & 0xFF00)								\
-								)
-
-#define COM_BYTEFLIP_32(_v)		( (((uint_32_t)(_v) >> __COM_CNT_BIT__(3)) & 0x000000FF)							\
-								| (((uint_32_t)(_v) >> __COM_CNT_BIT__(1)) & 0x0000FF00)							\
-								| (((uint_32_t)(_v) << __COM_CNT_BIT__(1)) & 0x00FF0000)							\
-								| (((uint_32_t)(_v) << __COM_CNT_BIT__(3)) & 0xFF000000)							\
-								)
 
 
-#define COM_BYTEFLIP_64(_v)		( (((uint_64_t)(_v) >> __COM_CNT_BIT__(7)) & COM_BIGNUM_U64(0x00000000000000FF))		\
-								| (((uint_64_t)(_v) >> __COM_CNT_BIT__(5)) & COM_BIGNUM_U64(0x000000000000FF00))		\
-								| (((uint_64_t)(_v) >> __COM_CNT_BIT__(3)) & COM_BIGNUM_U64(0x0000000000FF0000))		\
-								| (((uint_64_t)(_v) >> __COM_CNT_BIT__(1)) & COM_BIGNUM_U64(0x00000000FF000000))		\
-								| (((uint_64_t)(_v) << __COM_CNT_BIT__(1)) & COM_BIGNUM_U64(0x000000FF00000000))		\
-								| (((uint_64_t)(_v) << __COM_CNT_BIT__(3)) & COM_BIGNUM_U64(0x0000FF0000000000))		\
-								| (((uint_64_t)(_v) << __COM_CNT_BIT__(5)) & COM_BIGNUM_U64(0x00FF000000000000))		\
-								| (((uint_64_t)(_v) << __COM_CNT_BIT__(7)) & COM_BIGNUM_U64(0xFF00000000000000))		\
-								)
+int_16_t		COM_BYTEFLIP_16(int_16_t val);
+uint_16_t		COM_BYTEFLIP_U16(uint_16_t val);
 
 
+int_32_t		COM_BYTEFLIP_32(int_32_t val);
+uint_32_t		COM_BYTEFLIP_U32(uint_32_t val);
 
+
+int_64_t		COM_BYTEFLIP_64(int_64_t val);
+uint_64_t		COM_BYTEFLIP_U64(uint_64_t val);
 
 
 
 #define COM_LTON_16(_n)			COM_BYTEFLIP_16((_n))
 #define COM_LTON_32(_n)			COM_BYTEFLIP_32((_n))
 #define COM_LTON_64(_n)			COM_BYTEFLIP_64((_n))
+#define COM_LTON_U16(_n)		COM_BYTEFLIP_U16((_n))
+#define COM_LTON_U32(_n)		COM_BYTEFLIP_U32((_n))
+#define COM_LTON_U64(_n)		COM_BYTEFLIP_U64((_n))
 
 #define COM_NTOL_16(_n)			COM_BYTEFLIP_16((_n))
 #define COM_NTOL_32(_n)			COM_BYTEFLIP_32((_n))
 #define COM_NTOL_64(_n)			COM_BYTEFLIP_64((_n))
+#define COM_NTOL_U16(_n)		COM_BYTEFLIP_U16((_n))
+#define COM_NTOL_U32(_n)		COM_BYTEFLIP_U32((_n))
+#define COM_NTOL_U64(_n)		COM_BYTEFLIP_U64((_n))
+
+
+
 
 
 

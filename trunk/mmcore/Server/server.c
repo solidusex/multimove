@@ -28,14 +28,14 @@ bool_t Srv_UnInit()
 /*************************************************************************************************/
 
 
-
 /*
+
 
 传输协议，以下不论Client->Server或者Server->Client，均为网络字节序
 
 1. Client -> Server:
 [0-4)字节 包长度
-[4-6)字节 包类型 分为KeepAlive = 0, HandShake = 1, MouseEvent = 2, KeyboardEvent = 3
+[4-6)字节 包类型 分为KeepAlive = 0, HandShake = 1, MouseEnter = 2, MouseEvent = 3, KeyboardEvent = 4
 
 Content:
 
@@ -47,15 +47,18 @@ HandShake:		Content length == 1字节
 				[6-7)字节	direction	byte_t	方向 LEFT == 0, RIGHT == 1
 				包总长度为7字节
 
+MouseEnter:		Content length == 16字节
+				[6-10)字节 : src_x_fullscreen	:  uint_32_t; 源屏幕宽度
+				[10-14)字节 : src_x_fullscreen	:  uint_32_t; 源屏幕高度
+				[14-18)字节： x				:  int_32_t ; 鼠标x轴坐标
+				[18-22)字节： y				:  int_32_t ; 鼠标y轴坐标
 
 MouseEvent:		Content length == 16字节		
 		[6- 10)字节:  msg;				uint_32_t 消息类型
 		[10- 14)字节: x;				int_32_t  鼠标x轴坐标
 		[14-18)字节:  y;				int_32_t  鼠标y轴坐标
 		[18-22)字节:  data;				int_32_t  特殊数据，例如滚轮偏移
-		[22-23)字节:  mouse_enter		byte_t	  是否为鼠标首次进入Server桌面，是的话x,y为鼠标Client端坐标绝对值
 
-		包总长度为22字节
 
 KeyboardEvent:	Content length == 3字节			
 		[6-7)字节： vk;				byte_t			虚拟键盘码
@@ -78,8 +81,10 @@ HandShake:		Content length == 0字节
 
 MouseLeave:		Content length == 0字节
 
-*/
 
+
+
+*/
 
 
 typedef enum
@@ -391,7 +396,13 @@ static bool_t		OnTimer(srvClient_t *cli)
 		return true;
 }
 
-//KeepAlive = 0, HandShake = 1, MouseEvent = 2, KeyboardEvent = 3
+
+/*
+		KeepAlive = 0, HandShake = 1, 
+		MouseEnter = 2, MouseEvent = 3, 
+		KeyboardEvent = 4
+*/
+
 
 static bool_t		HandleRecvData(srvClient_t *cli, const byte_t *data, size_t length)
 {
@@ -428,38 +439,86 @@ static bool_t		HandleRecvData(srvClient_t *cli, const byte_t *data, size_t lengt
 				{
 						return false;
 				}
-
+				
 				switch(*p)
 				{
 				case 0:
 						cli->pos = SRV_LEFT_SRV;
 						cli->is_handshake = true;
+						SendHandShake(cli);
 						return true;
 						break;
 				case 1:
 						cli->pos = SRV_RIGHT_SRV;
 						cli->is_handshake = true;
+						SendHandShake(cli);
 						return true;
 				default:
 						return false;
 				}
+
+				
 		}
 				break;
-		case 2:/*MouseEvent*/
+		case 2:/*MouseEnter*/
+		{
+				uint_32_t src_x_fullscreen;
+				uint_32_t src_y_fullscreen;
+				int_32_t  x;
+				int_32_t  y;
+				
+				if(!cli->is_handshake)
+				{
+						return false;
+				}
+				
+				Com_memcpy(&src_x_fullscreen, p, sizeof(src_x_fullscreen));
+				p += sizeof(src_x_fullscreen);
+				length -= sizeof(src_x_fullscreen);
+				src_x_fullscreen = COM_NTOL_U32(src_x_fullscreen);
+
+				Com_memcpy(&src_y_fullscreen, p, sizeof(src_y_fullscreen));
+				p += sizeof(src_y_fullscreen);
+				length -= sizeof(src_y_fullscreen);
+				src_x_fullscreen = COM_NTOL_U32(src_y_fullscreen);
+
+
+				Com_memcpy(&x, p, sizeof(x));
+				p += sizeof(x);
+				length -= sizeof(x);
+				y = COM_NTOL_32(x);
+
+				Com_memcpy(&y, p, sizeof(y));
+				p += sizeof(y);
+				length -= sizeof(y);
+				y = COM_NTOL_32(y);
+				
+				if(src_x_fullscreen == 0 || src_y_fullscreen == 0)
+				{
+						return false;
+				}
+				
+
+				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 1, (DWORD)( y * 65535 / src_y_fullscreen), 0, 0);
+				
+
+				return true;
+		}
+				break;
+		case 3:/*MouseEvent*/
 		{
 
 				uint_32_t msg;	/* 消息类型*/
 				int_32_t x;		/* 鼠标x轴坐标*/
 				int_32_t y;		/* 鼠标y轴坐标*/
 				int_32_t data;	/*特殊数据，例如滚轮偏移*/
-				byte_t	mouse_enter; /*是否为鼠标首次进入Server桌面，是的话x,y为鼠标Client端坐标绝对值*/
 
 				if(!cli->is_handshake)
 				{
 						return false;
 				}
 
-				if(length < 17)
+				if(length < 16)
 				{
 						return false;
 				}
@@ -467,7 +526,7 @@ static bool_t		HandleRecvData(srvClient_t *cli, const byte_t *data, size_t lengt
 				Com_memcpy(&msg, p, sizeof(msg));
 				p += sizeof(msg);
 				length -= sizeof(msg);
-				msg = COM_NTOL_32(msg);
+				msg = COM_NTOL_U32(msg);
 
 				Com_memcpy(&x, p, sizeof(x));
 				p += sizeof(x);
@@ -484,29 +543,75 @@ static bool_t		HandleRecvData(srvClient_t *cli, const byte_t *data, size_t lengt
 				length -= sizeof(data);
 				data = COM_NTOL_32(data);
 
-				Com_memcpy(&mouse_enter, p, sizeof(mouse_enter));
-				p += sizeof(mouse_enter);
-				length -= sizeof(mouse_enter);
-
-
-				if(mouse_enter == 1)
+				/***************************************************/
+				switch(msg)
 				{
-
-				}else
+				case WM_MOUSEMOVE:
 				{
+						mouse_event(MOUSEEVENTF_MOVE, (DWORD)x, (DWORD)y, 0, 0);
+				}
+						return true;
+				case WM_LBUTTONDOWN:
+				{
+						mouse_event(MOUSEEVENTF_LEFTDOWN, 0,0, 0, 0);
+				}
+						return true;
+				case WM_LBUTTONUP:
+				{
+						mouse_event(MOUSEEVENTF_LEFTUP, 0,0, 0, 0);
+				}
+						return true;
+				case WM_RBUTTONDOWN:
+				{
+						mouse_event(MOUSEEVENTF_RIGHTDOWN, 0,0, 0, 0);
+				}
+						return true;
+				case WM_RBUTTONUP:
+				{
+						mouse_event(MOUSEEVENTF_RIGHTUP, 0,0, 0, 0);
 
 				}
-
-				
-				return false;
+						return true;
+				case WM_MOUSEWHEEL:
+				{
+						mouse_event(MOUSEEVENTF_WHEEL, 0,0, (DWORD)data, 0);
+				}
+						return true;
+				case WM_MOUSEHWHEEL:
+				{
+						mouse_event(MOUSEEVENTF_HWHEEL, 0,0, (DWORD)data, 0);
+				}
+						return true;
+				default:
+						return false;
+						break;
+				}
 		}
 				break;
-		case 3:/*KeyboardEvent*/
+		case 4:/*KeyboardEvent*/
 		{
-				return false;
+				byte_t vk, scan, is_keydown;
+
+				if(!cli->is_handshake)
+				{
+						return false;
+				}
+
+				if(length < 3)
+				{
+						return false;
+				}
+
+				vk = *p++;
+				scan = *p++;
+				is_keydown = *p++;
+
+				keybd_event(vk, scan, is_keydown ? 0 : KEYEVENTF_KEYUP, 0);
+
+				return true;
 		}
 				break;
-		default:
+		default:/*坏包*/
 				return false;
 		}
 }
@@ -720,6 +825,8 @@ static bool_t	handle_client_control(SOCKET client_fd, const struct sockaddr_in *
 
 				Com_LockMutex(&__g_client_lock);
 
+				Com_ASSERT(__g_client != NULL);
+
 				if(ret < 0)
 				{
 						Com_UnLockMutex(&__g_client_lock);
@@ -743,7 +850,6 @@ static bool_t	handle_client_control(SOCKET client_fd, const struct sockaddr_in *
 						}
 				}
 
-					
 				if(ret == 0)
 				{
 						Com_UnLockMutex(&__g_client_lock);

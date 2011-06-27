@@ -15,7 +15,7 @@ MM_NAMESPACE_BEGIN
 static bool_t	__g_is_client_mode = true;
 
 
-bool_t	MM_Init(const nsInit_t *init)
+bool_t	MM_Init(const mmInit_t *init)
 {
 		cmInit_t cm_init;
 		Com_ASSERT(init != NULL);

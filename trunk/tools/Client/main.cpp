@@ -1,16 +1,14 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <locale.h>
 #include <assert.h>
 
 
+#include "mmcore.h"
+#pragma comment(lib, "mmcore.lib")
 
-
-
-
-
-#include "test.h"
 
 
 
@@ -32,39 +30,37 @@ void __stdcall default_print(const wchar_t *msg, void *ctx)
 
 
 
-int main(int argc, char **argv)
+
+int main()
 {
+
 		mmInit_t init;
 		init.ctx = NULL;
 		init.on_error = default_error;
 		init.on_print = default_print;
 		init.is_client = true;
 
-
-		printf("current locale == %ls\r\n", setlocale(LC_ALL,NULL));
+		setlocale(LC_ALL,NULL);
 
 		MM_Init(&init);
 		
-		//Common_Test();
-		//Hook_Test();
-		//Client_Test();
-		Server_Test();
+		Cli_Start();
+
+		//Cli_InsertServer(cliDirection_t
+
+		getchar();
+		Cli_Stop();
+
+
 
 		MM_UnInit();
 
-#if (WINVER >= 0x401)
-		#if defined(DEBUG_FLAG)
-				_CrtDumpMemoryLeaks();
-		#endif
+#if defined(_DEBUG)
+		_CrtDumpMemoryLeaks();
 #endif
 		
-		printf("done\r\n");
-		
 
+		printf("done\r\n");
 		getchar();
 		return 0;
-
 }
-
-
-

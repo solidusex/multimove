@@ -249,12 +249,13 @@ static LRESULT CALLBACK mouse_hook_func(int code, WPARAM w, LPARAM l)
 										hkCliDispatchEntryParam_t param;
 
 										param.ctx = __g_entry[HK_DIR_LEFT].ctx;
-										param.event = HK_EVENT_MOUSE;
-										//param.mouse_evt = *mouse_stu;
-										Com_memset(&param.mouse_evt, 0, sizeof(param.mouse_evt));
-										param.mouse_evt.x = mouse_stu->pt.x;
-										param.mouse_evt.y = mouse_stu->pt.y;
-										param.mouse_evt.is_first_msg = true;
+										param.event = HK_EVENT_ENTER;
+										Com_memset(&param.enter_evt, 0, sizeof(param.enter_evt));
+										param.enter_evt.src_x_fullscreen = x_full_screen;
+										param.enter_evt.src_y_fullscreen = y_full_screen;
+										param.enter_evt.x = mouse_stu->pt.x;
+										param.enter_evt.y = mouse_stu->pt.y;
+
 										__g_entry[HK_DIR_LEFT].dispatch(&param);
 										__g_state = HK_STATE_REMOTE;
 										__g_curr_dir = HK_DIR_LEFT;
@@ -274,11 +275,13 @@ static LRESULT CALLBACK mouse_hook_func(int code, WPARAM w, LPARAM l)
 										hkCliDispatchEntryParam_t param;
 
 										param.ctx = __g_entry[HK_DIR_RIGHT].ctx;
-										param.event = HK_EVENT_MOUSE;
-										Com_memset(&param.mouse_evt, 0, sizeof(param.mouse_evt));
-										param.mouse_evt.x = mouse_stu->pt.x;
-										param.mouse_evt.y = mouse_stu->pt.y;
-										param.mouse_evt.is_first_msg = true;
+										param.event = HK_EVENT_ENTER;
+										Com_memset(&param.enter_evt, 0, sizeof(param.enter_evt));
+										param.enter_evt.src_x_fullscreen = x_full_screen;
+										param.enter_evt.src_y_fullscreen = y_full_screen;
+										param.enter_evt.x = mouse_stu->pt.x;
+										param.enter_evt.y = mouse_stu->pt.y;
+
 										__g_entry[HK_DIR_RIGHT].dispatch(&param);
 										__g_state = HK_STATE_REMOTE;
 										__g_curr_dir = HK_DIR_RIGHT;
@@ -320,7 +323,6 @@ static LRESULT CALLBACK mouse_hook_func(int code, WPARAM w, LPARAM l)
 						param.mouse_evt.y = mouse_stu->pt.y - __g_last_pt.y;
 						param.mouse_evt.msg = (uint_32_t)w;
 						param.mouse_evt.data = mouse_stu->mouseData;
-						param.mouse_evt.is_first_msg = false;
 						__g_entry[__g_curr_dir].dispatch(&param);
 				}
 				Com_UnLockSpinLock(&__g_lock);

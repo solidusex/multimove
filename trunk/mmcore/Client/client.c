@@ -30,7 +30,7 @@ bool_t Cli_UnInit()
 
 1. Client -> Server:
 [0-4)字节 包长度
-[4-6)字节 包类型 分为KeepAlive = 0, HandShake = 1, MouseEvent = 2, KeyboardEvent = 3
+[4-6)字节 包类型 分为KeepAlive = 0, HandShake = 1, MouseEnter = 2, MouseEvent = 3, KeyboardEvent = 4
 
 Content:
 
@@ -42,15 +42,18 @@ HandShake:		Content length == 1字节
 				[6-7)字节	direction	byte_t	方向 LEFT == 0, RIGHT == 1
 				包总长度为7字节
 
+MouseEnter:		Content length == 16字节
+				[6-10)字节 : src_x_fullscreen	:  uint_32_t; 源屏幕宽度
+				[10-14)字节 : src_x_fullscreen	:  uint_32_t; 源屏幕高度
+				[14-18)字节： x				:  int_32_t ; 鼠标x轴坐标
+				[18-22)字节： y				:  int_32_t ; 鼠标y轴坐标
 
 MouseEvent:		Content length == 16字节		
 		[6- 10)字节:  msg;				uint_32_t 消息类型
 		[10- 14)字节: x;				int_32_t  鼠标x轴坐标
 		[14-18)字节:  y;				int_32_t  鼠标y轴坐标
 		[18-22)字节:  data;				int_32_t  特殊数据，例如滚轮偏移
-		[22-23)字节:  mouse_enter		byte_t	  是否为鼠标首次进入Server桌面，是的话x,y为鼠标Client端坐标绝对值
 
-		包总长度为22字节
 
 KeyboardEvent:	Content length == 3字节			
 		[6-7)字节： vk;				byte_t			虚拟键盘码
@@ -134,7 +137,7 @@ static bool_t		Cli_SendKeepAlive(cliSrv_t *srv);
 static bool_t		Cli_SendHandShake(cliSrv_t *srv, cliServerDir_t dir);
 static bool_t		Cli_SendMouseMsg(cliSrv_t *srv, const hkMouseEvent_t *mouse_msg);
 static bool_t		Cli_SendKeyboardMsg(cliSrv_t *srv, const hkKeyboardEvent_t *keyboard);
-
+static bool_t		Cli_SendEnterMsg(cliSrv_t *srv, const hkEnterEvent_t     *enter);
 /*接收*/
 static bool_t		Cli_HandleRecvBuffer(cliSrv_t *srv, const byte_t *data, size_t length);
 
@@ -245,8 +248,8 @@ static bool_t		Cli_SendKeepAlive(cliSrv_t *srv)
 
 		package_len = sizeof(package_type);
 		package_len = COM_LTON_32(package_len);
-
-		package_type = COM_LTON_16(0);
+		
+		package_type = COM_LTON_U16(0);
 
 		Com_LockMutex(&srv->out_lock);
 		Com_InsertBuffer(srv->out_buf, (const byte_t*)&package_len, sizeof(package_len));
@@ -295,37 +298,72 @@ static bool_t		Cli_SendHandShake(cliSrv_t *srv, cliServerDir_t dir)
 		return true;
 }
 
+
+static bool_t		Cli_SendEnterMsg(cliSrv_t *srv, const hkEnterEvent_t     *enter)
+{
+		uint_32_t package_len;
+		uint_16_t package_type;
+		
+		uint_32_t		src_x;
+		uint_32_t		src_y;
+
+		int_32_t		x;		/*鼠标x轴坐标*/
+		int_32_t		y;		/*鼠标y轴坐标*/
+
+		Com_ASSERT(srv != NULL && enter != NULL);
+
+		package_len = sizeof(package_type) + sizeof(src_x) + sizeof(src_y) + sizeof(x) + sizeof(y);
+		package_len = COM_LTON_U32(package_len);
+		package_type = COM_LTON_U16(2);
+
+		src_x = COM_LTON_U32(enter->src_x_fullscreen);
+		src_y = COM_LTON_U32(enter->src_y_fullscreen);
+		x = COM_LTON_32(enter->x);
+		y = COM_LTON_32(enter->y);
+
+		
+		Com_LockMutex(&srv->out_lock);
+
+
+
+		Com_InsertBuffer(srv->out_buf, (const byte_t*)&package_len, sizeof(package_len));
+		Com_InsertBuffer(srv->out_buf, (const byte_t*)&package_type, sizeof(package_type));
+
+		Com_InsertBuffer(srv->out_buf, (const byte_t*)&src_x, sizeof(src_x));
+		Com_InsertBuffer(srv->out_buf, (const byte_t*)&src_y, sizeof(src_y));
+		Com_InsertBuffer(srv->out_buf, (const byte_t*)&x, sizeof(x));
+		Com_InsertBuffer(srv->out_buf, (const byte_t*)&y, sizeof(y));
+
+		Com_UnLockMutex(&srv->out_lock);
+
+		srv->is_active_side = true;
+
+		return true;
+}
+
 static bool_t		Cli_SendMouseMsg(cliSrv_t *srv, const hkMouseEvent_t *mouse_msg)
 {
 		uint_32_t package_len;
 		uint_16_t package_type;
 		
 		uint_32_t		msg;	/* 消息类型*/
-		uint_32_t		x;		/*鼠标x轴坐标*/
-		uint_32_t		y;		/*鼠标y轴坐标*/
+		int_32_t		x;		/*鼠标x轴坐标*/
+		int_32_t		y;		/*鼠标y轴坐标*/
 		uint_32_t		data;	/*特殊数据，例如滚轮偏移*/
-		byte_t			mouse_enter; /* 是否为鼠标首次进入Server桌面，是的话x,y为鼠标Client端坐标绝对值*/
-		
 
 
 		Com_ASSERT(srv != NULL);
 
-		package_len = sizeof(package_type) + sizeof(msg) + sizeof(x) + sizeof(y) + sizeof(data) + sizeof(mouse_enter);
-		package_len = COM_LTON_32(package_len);
-		package_type = COM_LTON_16(2);
-		msg = COM_LTON_32(mouse_msg->msg);
+		package_len = sizeof(package_type) + sizeof(msg) + sizeof(x) + sizeof(y) + sizeof(data);
+		package_len = COM_LTON_U32(package_len);
+		package_type = COM_LTON_U16(3);
+		msg = COM_LTON_U32(mouse_msg->msg);
 		x = COM_LTON_32(mouse_msg->x);
 		y = COM_LTON_32(mouse_msg->y);
 		data = COM_LTON_32(mouse_msg->data);
-		mouse_enter = mouse_msg->is_first_msg ? 1 : 0;
-
 
 		Com_LockMutex(&srv->out_lock);
 
-		if(mouse_msg->is_first_msg)
-		{
-				srv->is_active_side = true;
-		}
 
 		Com_InsertBuffer(srv->out_buf, (const byte_t*)&package_len, sizeof(package_len));
 		Com_InsertBuffer(srv->out_buf, (const byte_t*)&package_type, sizeof(package_type));
@@ -334,7 +372,6 @@ static bool_t		Cli_SendMouseMsg(cliSrv_t *srv, const hkMouseEvent_t *mouse_msg)
 		Com_InsertBuffer(srv->out_buf, (const byte_t*)&x, sizeof(x));
 		Com_InsertBuffer(srv->out_buf, (const byte_t*)&y, sizeof(y));
 		Com_InsertBuffer(srv->out_buf, (const byte_t*)&data, sizeof(data));
-		Com_InsertBuffer(srv->out_buf, (const byte_t*)&mouse_enter, sizeof(mouse_enter));
 
 		Com_UnLockMutex(&srv->out_lock);
 
@@ -361,8 +398,8 @@ static bool_t		Cli_SendKeyboardMsg(cliSrv_t *srv, const hkKeyboardEvent_t *keybo
 		Com_ASSERT(srv != NULL);
 
 		package_len = sizeof(package_type) + sizeof(vk) + sizeof(scan) + sizeof(is_keydown);
-		package_len = COM_LTON_32(package_len);
-		package_type = COM_LTON_16(3);
+		package_len = COM_LTON_U32(package_len);
+		package_type = COM_LTON_U16(4);
 		vk = keyboard->vk;
 		scan = keyboard->scan;
 		is_keydown = keyboard->is_keydown;
@@ -678,8 +715,6 @@ bool_t	Cli_InsertServer(cliServerDir_t dir, const wchar_t *srv_ip, uint_16_t por
 				return false;
 		}
 
-
-
 		Com_LockMutex(&__g_srv_mtx);
 		has_srv = __g_srv_set[dir] != NULL;
 		Com_UnLockMutex(&__g_srv_mtx);
@@ -861,8 +896,7 @@ static void	client_io_thread_func(void *data)
 				{
 						size_t k;
 						Com_LockMutex(&__g_srv_mtx);
-
-
+						
 						for(i = 0; i < wd_set.fd_count; ++i)
 						{
 								for(k = 0; k < CLI_DIR_MAX; ++k)
@@ -937,6 +971,9 @@ static bool_t hook_dispatch(const hkCliDispatchEntryParam_t *parameter)
 		
 		switch(parameter->event)
 		{
+		case HK_EVENT_ENTER:
+				return Cli_SendEnterMsg((cliSrv_t*)parameter->ctx, &parameter->enter_evt);
+				break;
 		case HK_EVENT_MOUSE:
 				return Cli_SendMouseMsg((cliSrv_t*)parameter->ctx, &parameter->mouse_evt);
 				break;

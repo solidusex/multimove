@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="mmcore"
-	ProjectGUID="{07325191-A3B8-44BD-B3F5-4EA631291A76}"
-	RootNamespace="mmcore"
+	Name="Server"
+	ProjectGUID="{D97CFF0B-89DE-4B30-AAD0-4F42186062F7}"
+	RootNamespace="Server"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -21,9 +21,10 @@
 	<Configurations>
 		<Configuration
 			Name="DLLDebug|Win32"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,15 +41,14 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\mmcore;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;AR_SHARED_LIB"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
+				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="false"
@@ -56,7 +56,7 @@
 				AssemblerOutput="2"
 				WarningLevel="4"
 				DebugInformationFormat="4"
-				CompileAs="1"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -66,22 +66,18 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine=""
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
-				GenerateManifest="true"
+				AdditionalLibraryDirectories="$(OutDir)\"
 				ManifestFile="$(IntDir)\$(TargetFileName).intermediate.manifest"
-				ModuleDefinitionFile="export.def"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				GenerateMapFile="true"
-				SubSystem="2"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)$(TargetName).lib"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -110,9 +106,10 @@
 		</Configuration>
 		<Configuration
 			Name="DLLDebug|x64"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
 			CharacterSet="1"
 			>
 			<Tool
@@ -134,10 +131,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN64;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="..\..\mmcore;"
+				PreprocessorDefinitions="WIN64;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
-				ExceptionHandling="0"
+				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				RuntimeTypeInfo="false"
@@ -145,7 +142,7 @@
 				AssemblerOutput="2"
 				WarningLevel="4"
 				DebugInformationFormat="4"
-				CompileAs="1"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -158,19 +155,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
-				GenerateManifest="true"
+				AdditionalLibraryDirectories="$(OutDir)\"
 				ManifestFile="$(IntDir)\$(TargetFileName).intermediate.manifest"
-				ModuleDefinitionFile="export.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				GenerateMapFile="true"
-				SubSystem="2"
-				RandomizedBaseAddress="0"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)$(TargetName).lib"
+				SubSystem="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -198,9 +190,10 @@
 		</Configuration>
 		<Configuration
 			Name="DLLRelease|Win32"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -218,26 +211,21 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TargetEnvironment="3"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
-				ExceptionHandling="0"
+				AdditionalIncludeDirectories="..\..\mmcore;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;AR_SHARED_LIB"
+				ExceptionHandling="1"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
-				AssemblerOutput="0"
 				WarningLevel="4"
 				DebugInformationFormat="3"
-				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -250,21 +238,18 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
-				GenerateManifest="true"
+				AdditionalLibraryDirectories="$(OutDir)\"
 				ManifestFile="$(IntDir)\$(TargetFileName).intermediate.manifest"
-				ModuleDefinitionFile="export.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				GenerateMapFile="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)$(TargetName).lib"
 				TargetMachine="1"
+				Profile="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -283,7 +268,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-				PageHeapConserveMemory="false"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -292,9 +276,10 @@
 		</Configuration>
 		<Configuration
 			Name="DLLRelease|x64"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="2"
+			OutputDirectory="..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			UseOfMFC="0"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -317,20 +302,18 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
-				ExceptionHandling="0"
+				AdditionalIncludeDirectories="..\..\mmcore;"
+				PreprocessorDefinitions="WIN64;NDEBUG;_CONSOLE"
+				ExceptionHandling="1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
-				AssemblerOutput="0"
 				WarningLevel="4"
 				DebugInformationFormat="3"
-				CompileAs="1"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -343,22 +326,18 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)\$(ProjectName).dll"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
-				GenerateManifest="true"
+				AdditionalLibraryDirectories="$(OutDir)\"
 				ManifestFile="$(IntDir)\$(TargetFileName).intermediate.manifest"
-				ModuleDefinitionFile="export.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)\$(TargetName).pdb"
 				GenerateMapFile="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				ImportLibrary="$(TargetDir)$(TargetName).lib"
 				TargetMachine="17"
+				Profile="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -387,100 +366,8 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Common"
-			>
-			<File
-				RelativePath="..\..\..\mmcore\common\buffer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\byteorder.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\common\common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\common\common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\common\net.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\common\strconv.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\common\string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\common\textfile.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\common\thread.c"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Client"
-			>
-			<File
-				RelativePath="..\..\..\mmcore\Client\cli_hook.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Client\cli_hook.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Client\client.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Client\client.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Server"
-			>
-			<File
-				RelativePath="..\..\..\mmcore\Server\server.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Server\server.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Server\srv_hook.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Server\srv_hook.h"
-				>
-			</File>
-		</Filter>
 		<File
-			RelativePath=".\event.bat"
-			>
-		</File>
-		<File
-			RelativePath=".\export.def"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\mmcore\mmcore.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\mmcore\mmcore.h"
+			RelativePath=".\main.cpp"
 			>
 		</File>
 	</Files>

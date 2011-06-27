@@ -20,16 +20,16 @@ MM_NAMESPACE_BEGIN
 
 
 
-typedef struct	__netscan_init_tag		
+typedef struct	__mmcore_init_tag		
 {
 		Com_print_func_t		on_print;
 		Com_error_func_t		on_error;
 		void					*ctx;
 		bool_t					is_client;
-}nsInit_t;
+}mmInit_t;
 
 
-bool_t	MM_Init(const nsInit_t *init);
+bool_t	MM_Init(const mmInit_t *init);
 bool_t	MM_UnInit();
 
 

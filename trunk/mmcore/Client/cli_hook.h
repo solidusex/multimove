@@ -29,9 +29,20 @@ typedef enum
 
 typedef enum
 {
+		HK_EVENT_ENTER,
 		HK_EVENT_MOUSE,
 		HK_EVENT_KEYBOARD
 }hkCliEvent_t;
+
+
+
+typedef struct __enter_event_tag
+{
+		uint_32_t		src_x_fullscreen;
+		uint_32_t		src_y_fullscreen;
+		int_32_t		x;
+		int_32_t		y;
+}hkEnterEvent_t;
 
 
 typedef struct __mouse_event_tag
@@ -40,8 +51,7 @@ typedef struct __mouse_event_tag
 		int_32_t	x;
 		int_32_t	y;
 		int_32_t	data; /*¹öÂÖÆ«ÒÆ*/
-		bool_t		is_first_msg;
-}hkMouseEvent_t;		
+}hkMouseEvent_t;
 
 
 typedef struct __keyboard_event_tag
@@ -57,6 +67,7 @@ typedef struct __hook_client_dispatch_entry_param_tag
 		void					*ctx;
 		
 		union{
+				hkEnterEvent_t		enter_evt;
 				hkMouseEvent_t		mouse_evt;
 				hkKeyboardEvent_t	keyboard_evt;
 		};
