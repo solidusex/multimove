@@ -9,9 +9,6 @@ MM_NAMESPACE_BEGIN
 struct __hook_server_init_tag;
 typedef struct __hook_server_init_tag	hkSrvInit_t;
 
-bool_t Hook_Srv_Init(const hkSrvInit_t *init);
-bool_t Hook_Srv_UnInit();
-
 
 
 typedef bool_t (*OnMouseEventFunc_t)(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu);
