@@ -17,18 +17,21 @@ typedef enum
 }nmPosition_t;
 
 
-#define NM_KEEPALIVE_TIMEOUT			10 * 1000		/*1000秒钟没有任何socket上的IO操作则认为该客户端已不存在*/
+#define NM_KEEPALIVE_TIMEOUT			1000 * 1000		/*1000秒钟没有任何socket上的IO操作则认为该客户端已不存在*/
 #define NM_TIMER_TICK					1  * 1000		/*2秒检查一次*/
 
 
 #define NM_BLOCKING_TIMEOUT				20				/*所有阻塞等待最长为20毫秒*/
-#define NM_SEND_TIMEOUT					3 * 1000		/*发送时阻塞超时*/
 
 
+
+
+#define NM_PACKAGE_HEADER_LENGTH			2
 
 typedef enum
 {
-		NM_MSG_HANDSHAKE = 0x00,		/*Client -> Server*/
+		NM_MSG_KEEPALIVE = 0x00,		/* Client -> Server && Server -> Client */
+		NM_MSG_HANDSHAKE,				/*Client -> Server*/
 		NM_MSG_HANDSHAKE_REPLY,			/*Server -> Client*/
 
 		NM_MSG_ENTER,					/*Client -> Server*/
@@ -102,66 +105,6 @@ bool_t	NM_ParseFromBuffer(const byte_t *data, size_t len, nmMsg_t	*msg);
 
 
 
-
-
-/*
-
-传输协议，以下不论Client->Server或者Server->Client，均为网络字节序
-
-1. Client -> Server:
-[0-4)字节 包长度
-[4-6)字节 包类型 分为KeepAlive = 0, HandShake = 1, MouseEnter = 2, MouseEvent = 3, KeyboardEvent = 4
-
-Content:
-
-KeeyAlive:		Content length == 0 字节 
-				包总长度为6字节
-
-
-HandShake:		Content length == 1字节		
-				[6-7)字节	direction	byte_t	方向 LEFT == 0, RIGHT == 1
-				包总长度为7字节
-
-MouseEnter:		Content length == 16字节
-				[6-10)字节 : src_x_fullscreen	:  uint_32_t; 源屏幕宽度
-				[10-14)字节 : src_x_fullscreen	:  uint_32_t; 源屏幕高度
-				[14-18)字节： x				:  int_32_t ; 鼠标x轴坐标
-				[18-22)字节： y				:  int_32_t ; 鼠标y轴坐标
-
-MouseEvent:		Content length == 16字节		
-		[6- 10)字节:  msg;				uint_32_t 消息类型
-		[10- 14)字节: x;				int_32_t  鼠标x轴坐标
-		[14-18)字节:  y;				int_32_t  鼠标y轴坐标
-		[18-22)字节:  data;				int_32_t  特殊数据，例如滚轮偏移
-
-
-KeyboardEvent:	Content length == 3字节			
-		[6-7)字节： vk;				byte_t			虚拟键盘码
-		[7-8)字节:	 scan;				byte_t			扫描码
-		[8-9)字节:	 is_keydown			bool_t			是否为键被按下
-
-		包总长度为9字节
-
-
-
-
-
-2. Server -> Client:
-[0-4)字节  包长度
-[4-6)字节  包类型, 分为KeepAlive = 0, HandShake = 1, MouseLeave = 2
-
-Content:
-
-KeeyAlive:		Content length == 0字节
-
-HandShake:		Content length == 0字节
-
-MouseLeave:		Content length == 0字节
-
-
-
-
-*/
 
 
 

@@ -19,6 +19,43 @@ MM_NAMESPACE_BEGIN
 //bool_t	NM_ParseFromBuffer(const byte_t *data, size_t len, nmMsg_t	*msg);
 
 
+void msg_test_keepalive_msg()
+{
+
+		nmMsg_t	s,d;
+		cmBuffer_t *buf;
+		buf = Com_CreateBuffer(1024);
+
+		Com_memset(&s,0,sizeof(s));
+		Com_memset(&d,0,sizeof(d));
+
+		s.t = NM_MSG_KEEPALIVE;
+		
+		
+		if(!NM_MsgToBuffer(&s, buf))
+		{
+				Com_ASSERT(false);
+		}
+
+		uint_16_t package_len;
+		Com_memcpy(&package_len, Com_GetBufferData(buf), sizeof(package_len));
+		package_len = COM_NTOL_U16(package_len);
+
+		Com_ASSERT(package_len == 1);
+		Com_EraseBuffer(buf, sizeof(package_len));
+
+		if(!NM_ParseFromBuffer(Com_GetBufferData(buf), Com_GetBufferAvailable(buf), &d))
+		{
+				Com_ASSERT(false);
+		}
+		Com_ASSERT(Com_memcmp(&s, &d, sizeof(s)) == 0);
+
+		Com_DestroyBuffer(buf);
+		buf = NULL;
+}
+
+
+
 void msg_test_handshake_msg()
 {
 		nmMsg_t	s,d;
@@ -40,7 +77,7 @@ void msg_test_handshake_msg()
 		Com_memcpy(&package_len, Com_GetBufferData(buf), sizeof(package_len));
 		package_len = COM_NTOL_U16(package_len);
 
-		Com_ASSERT(package_len == 4);
+		Com_ASSERT(package_len == 2);
 		Com_EraseBuffer(buf, sizeof(package_len));
 
 		if(!NM_ParseFromBuffer(Com_GetBufferData(buf), Com_GetBufferAvailable(buf), &d))
@@ -75,7 +112,7 @@ void msg_test_handshake_reply_msg()
 		Com_memcpy(&package_len, Com_GetBufferData(buf), sizeof(package_len));
 		package_len = COM_NTOL_U16(package_len);
 
-		Com_ASSERT(package_len == 2);
+		Com_ASSERT(package_len == 1);
 		Com_EraseBuffer(buf, sizeof(package_len));
 
 		if(!NM_ParseFromBuffer(Com_GetBufferData(buf), Com_GetBufferAvailable(buf), &d))
@@ -117,7 +154,7 @@ void msg_test_enter_msg()
 		Com_memcpy(&package_len, Com_GetBufferData(buf), sizeof(package_len));
 		package_len = COM_NTOL_U16(package_len);
 
-		Com_ASSERT(package_len == 18);
+		Com_ASSERT(package_len == 9);
 		Com_EraseBuffer(buf, sizeof(package_len));
 
 		if(!NM_ParseFromBuffer(Com_GetBufferData(buf), Com_GetBufferAvailable(buf), &d))
@@ -156,7 +193,7 @@ void msg_test_leave_msg()
 		Com_memcpy(&package_len, Com_GetBufferData(buf), sizeof(package_len));
 		package_len = COM_NTOL_U16(package_len);
 
-		Com_ASSERT(package_len == 18);
+		Com_ASSERT(package_len == 9);
 		Com_EraseBuffer(buf, sizeof(package_len));
 
 		if(!NM_ParseFromBuffer(Com_GetBufferData(buf), Com_GetBufferAvailable(buf), &d))
@@ -168,6 +205,7 @@ void msg_test_leave_msg()
 		Com_DestroyBuffer(buf);
 		buf = NULL;
 }
+
 
 
 
@@ -196,7 +234,7 @@ void msg_test_mouse_msg()
 		Com_memcpy(&package_len, Com_GetBufferData(buf), sizeof(package_len));
 		package_len = COM_NTOL_U16(package_len);
 
-		Com_ASSERT(package_len == 18);
+		Com_ASSERT(package_len == 9);
 		Com_EraseBuffer(buf, sizeof(package_len));
 
 		if(!NM_ParseFromBuffer(Com_GetBufferData(buf), Com_GetBufferAvailable(buf), &d))
@@ -235,7 +273,7 @@ void msg_test_keyboard_msg()
 		Com_memcpy(&package_len, Com_GetBufferData(buf), sizeof(package_len));
 		package_len = COM_NTOL_U16(package_len);
 
-		Com_ASSERT(package_len == 5);
+		Com_ASSERT(package_len == 4);
 		Com_EraseBuffer(buf, sizeof(package_len));
 
 		if(!NM_ParseFromBuffer(Com_GetBufferData(buf), Com_GetBufferAvailable(buf), &d))
@@ -255,6 +293,7 @@ void msg_test_keyboard_msg()
 
 void NetMsg_Test()
 {
+		msg_test_keepalive_msg();
 		
 		msg_test_handshake_msg();
 
