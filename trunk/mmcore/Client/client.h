@@ -21,19 +21,10 @@ bool_t	Cli_Start();
 bool_t	Cli_Stop();
 
 
-typedef enum
-{
-		CLI_LEFT_SRV = 0x00,
-		CLI_RIGHT_SRV,
-
-		CLI_DIR_MAX
-}cliServerDir_t;
 
 
-
-
-bool_t	Cli_InsertServer(cliServerDir_t dir, const wchar_t *srv_ip, uint_16_t port);
-bool_t	Cli_RemoveServer(cliServerDir_t dir);
+bool_t	Cli_InsertServer(nmPosition_t pos, const wchar_t *srv_ip, uint_16_t port);
+bool_t	Cli_RemoveServer(nmPosition_t pos);
 
 
 

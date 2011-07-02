@@ -192,7 +192,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 		{
 				if(mouse_stu->pt.x <= 0)
 				{
-						Com_printf(L"Shift trigger point on : (%d:%d)\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
+						Com_printf(L"Shift trigger point on : (%d:%d) to left\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
 						Com_LockSpinLock(&__g_lock);
 
@@ -204,12 +204,14 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 								msg.enter.src_y_fullscreen = y_full_screen;
 								msg.enter.x = mouse_stu->pt.x;
 								msg.enter.y = mouse_stu->pt.y;
-
-								__g_entry[NM_POS_LEFT].handler(&msg, __g_entry[NM_POS_LEFT].ctx);
 								
 								__g_state    = HK_STATE_REMOTE;
 								__g_curr_pos = NM_POS_LEFT;
 								__g_prev_pt = mouse_stu->pt;
+
+								__g_entry[NM_POS_LEFT].handler(&msg, __g_entry[NM_POS_LEFT].ctx);
+								
+								
 								
 								Com_printf(L"Shift to left side\r\n");
 						}
@@ -219,7 +221,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 				
 				}else if(mouse_stu->pt.x >= x_full_screen)
 				{
-						Com_printf(L"Shift trigger point on : (%d:%d)\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
+						Com_printf(L"Shift trigger point on : (%d:%d) to right\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
 						Com_LockSpinLock(&__g_lock);
 
@@ -260,6 +262,9 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 				break;
 		}
 }
+
+
+
 
 static LRESULT on_remote_mouse_action(int code, WPARAM w, LPARAM l)
 {

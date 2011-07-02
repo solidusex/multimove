@@ -86,11 +86,14 @@ bool_t	Com_Init(const cmInit_t *init)
 				__g_init = *init;
 		}
 
+		Com_printf(L"On Com_Init\r\n");
 		return true;
 }
 
 bool_t	Com_UnInit()
 {
+		Com_printf(L"On Com_UnInit\r\n");
+
 		__net_uninit();
 		return true;
 }

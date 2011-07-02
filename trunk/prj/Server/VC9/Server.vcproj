@@ -431,19 +431,19 @@
 			Name="Server"
 			>
 			<File
-				RelativePath="..\..\..\mmcore\Server\cli_hook.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Server\cli_hook.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\mmcore\Server\Server.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\mmcore\Server\Server.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\srv_hook.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\srv_hook.h"
 				>
 			</File>
 		</Filter>

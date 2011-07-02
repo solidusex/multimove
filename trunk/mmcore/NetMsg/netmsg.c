@@ -19,16 +19,30 @@ typedef enum
 #endif
 
 
+bool_t	keepalive_to_buffer(const nmMsg_t	*msg, cmBuffer_t		*out)
+{
+		uint_16_t		package_len;
+		uint_8_t		package_type;
+		Com_ASSERT(msg != NULL && out != NULL);
+
+		package_len = COM_LTON_U16(sizeof(package_type));
+		package_type = NM_MSG_KEEPALIVE;
+		
+		Com_InsertBuffer(out, (const byte_t*)&package_len, sizeof(package_len));
+		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
+		return true;
+}
+
 static bool_t	handshake_to_buffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 {
 		uint_16_t		package_len;
-		uint_16_t		package_type;
-		uint_16_t		pos;
+		uint_8_t		package_type;
+		uint_8_t		pos;
 		Com_ASSERT(msg != NULL && out != NULL);
 
 		package_len = COM_LTON_U16(sizeof(package_type) + sizeof(pos));
-		package_type = COM_LTON_U16(NM_MSG_HANDSHAKE);
-		pos = COM_LTON_U16((uint_16_t)msg->handshake.srv_pos);
+		package_type = NM_MSG_HANDSHAKE;
+		pos = (uint_8_t)msg->handshake.srv_pos;
 		
 		Com_InsertBuffer(out, (const byte_t*)&package_len, sizeof(package_len));
 		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
@@ -41,11 +55,11 @@ static bool_t	handshake_to_buffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 static bool_t	handshake_reply_to_buffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 {
 		uint_16_t		package_len;
-		uint_16_t		package_type;
+		uint_8_t		package_type;
 		Com_ASSERT(msg != NULL && out != NULL);
 
 		package_len = COM_LTON_U16(sizeof(package_type));
-		package_type = COM_LTON_U16(NM_MSG_HANDSHAKE_REPLY);
+		package_type = NM_MSG_HANDSHAKE_REPLY;
 		
 		Com_InsertBuffer(out, (const byte_t*)&package_len, sizeof(package_len));
 		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
@@ -56,22 +70,23 @@ static bool_t	handshake_reply_to_buffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 static bool_t	enter_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 {
 		uint_16_t		package_len;
-		uint_16_t		package_type;
+		uint_8_t		package_type;
 
-		uint_32_t		src_x_fullscreen;
-		uint_32_t		src_y_fullscreen;
-		int_32_t		x;
-		int_32_t		y;
+
+		uint_16_t		src_x_fullscreen;
+		uint_16_t		src_y_fullscreen;
+		int_16_t		x;
+		int_16_t		y;
 		
 		Com_ASSERT(msg != NULL && out != NULL);
 
 		package_len = COM_LTON_U16(sizeof(package_type) + sizeof(src_x_fullscreen) + sizeof(src_y_fullscreen) + sizeof(x) + sizeof(y));
-		package_type = COM_LTON_U16(NM_MSG_ENTER);
+		package_type = NM_MSG_ENTER;
 		
-		src_x_fullscreen = COM_LTON_U32(msg->enter.src_x_fullscreen);
-		src_y_fullscreen = COM_LTON_U32(msg->enter.src_y_fullscreen);
-		x = COM_LTON_32(msg->enter.x);
-		y = COM_LTON_32(msg->enter.y);
+		src_x_fullscreen = COM_LTON_U16(msg->enter.src_x_fullscreen);
+		src_y_fullscreen = COM_LTON_U16(msg->enter.src_y_fullscreen);
+		x = COM_LTON_16(msg->enter.x);
+		y = COM_LTON_16(msg->enter.y);
 		
 		Com_InsertBuffer(out, (const byte_t*)&package_len, sizeof(package_len));
 		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
@@ -89,22 +104,22 @@ static bool_t	leave_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 {
 		
 		uint_16_t		package_len;
-		uint_16_t		package_type;
+		uint_8_t		package_type;
 
-		uint_32_t		src_x_fullscreen;
-		uint_32_t		src_y_fullscreen;
-		int_32_t		x;
-		int_32_t		y;
+		uint_16_t		src_x_fullscreen;
+		uint_16_t		src_y_fullscreen;
+		int_16_t		x;
+		int_16_t		y;
 		
 		Com_ASSERT(msg != NULL && out != NULL);
 
 		package_len = COM_LTON_U16(sizeof(package_type) + sizeof(src_x_fullscreen) + sizeof(src_y_fullscreen) + sizeof(x) + sizeof(y));
-		package_type = COM_LTON_U16(NM_MSG_LEAVE);
+		package_type = NM_MSG_LEAVE;
 		
-		src_x_fullscreen = COM_LTON_U32(msg->leave.src_x_fullscreen);
-		src_y_fullscreen = COM_LTON_U32(msg->leave.src_y_fullscreen);
-		x = COM_LTON_32(msg->leave.x);
-		y = COM_LTON_32(msg->leave.y);
+		src_x_fullscreen = COM_LTON_U16(msg->leave.src_x_fullscreen);
+		src_y_fullscreen = COM_LTON_U16(msg->leave.src_y_fullscreen);
+		x = COM_LTON_16(msg->leave.x);
+		y = COM_LTON_16(msg->leave.y);
 		
 		Com_InsertBuffer(out, (const byte_t*)&package_len, sizeof(package_len));
 		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
@@ -121,22 +136,22 @@ static bool_t	leave_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 static bool_t	mouse_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 {
 		uint_16_t		package_len;
-		uint_16_t		package_type;
+		uint_8_t		package_type;
 
-		uint_32_t		msg_code;
-		int_32_t		x;
-		int_32_t		y;
-		uint_32_t		data;
+		uint_16_t		msg_code;
+		int_16_t		x;
+		int_16_t		y;
+		int_16_t		data;
 		
 		Com_ASSERT(msg != NULL && out != NULL);
 
-		package_len = COM_LTON_U16(sizeof(package_type) + sizeof(msg) + sizeof(x) + sizeof(y) + sizeof(data));
-		package_type = COM_LTON_U16(NM_MSG_MOUSE);
+		package_len = COM_LTON_U16(sizeof(package_type) + sizeof(msg_code) + sizeof(x) + sizeof(y) + sizeof(data));
+		package_type = NM_MSG_MOUSE;
 		
-		msg_code = COM_LTON_U32(msg->mouse.msg);
-		x = COM_LTON_32(msg->mouse.x);
-		y = COM_LTON_32(msg->mouse.y);
-		data = COM_LTON_U32(msg->mouse.data);
+		msg_code = COM_LTON_U16(msg->mouse.msg);
+		x = COM_LTON_16(msg->mouse.x);
+		y = COM_LTON_16(msg->mouse.y);
+		data = COM_LTON_16(msg->mouse.data);
 		
 		Com_InsertBuffer(out, (const byte_t*)&package_len, sizeof(package_len));
 		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
@@ -154,7 +169,7 @@ static bool_t	mouse_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 static bool_t	keybd_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 {
 		uint_16_t		package_len;
-		uint_16_t		package_type;
+		uint_8_t		package_type;
 
 		byte_t			vk;
 		byte_t			scan;
@@ -163,7 +178,7 @@ static bool_t	keybd_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 		Com_ASSERT(msg != NULL && out != NULL);
 
 		package_len = COM_LTON_U16(sizeof(package_type) + sizeof(vk) + sizeof(scan) + sizeof(is_keydown));
-		package_type = COM_LTON_U16(NM_MSG_KEYBOARD);
+		package_type = NM_MSG_KEYBOARD;
 		
 		vk = msg->keyboard.vk;
 		scan = msg->keyboard.scan;
@@ -185,10 +200,10 @@ bool_t	NM_MsgToBuffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 {
 		Com_ASSERT(msg != NULL && out != NULL);
 
-		Com_ClearBuffer(out);
-
 		switch(msg->t)
 		{
+		case NM_MSG_KEEPALIVE:
+				return keepalive_to_buffer(msg, out);
 		case NM_MSG_HANDSHAKE:
 				return handshake_to_buffer(msg, out);
 				break;
@@ -216,25 +231,41 @@ bool_t	NM_MsgToBuffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 
 
 
+static bool_t parse_keepalive(const byte_t *data, size_t len, nmMsg_t	*msg)
+{
+		Com_ASSERT(data != NULL && msg != NULL);
+
+		if(len != 0)
+		{
+				return false;
+		}
+		
+		Com_memset(msg, 0, sizeof(*msg));
+		msg->t = NM_MSG_KEEPALIVE;
+		return true;
+}
+
+
 
 
 
 static bool_t parse_handshake(const byte_t *data, size_t len, nmMsg_t	*msg)
 {
-		uint_16_t		pos;
+		uint_8_t		pos;
 		Com_ASSERT(data != NULL && msg != NULL);
 
-		if(len != 2)
+		if(len != 1)
 		{
 				return false;
 		}
 
 		Com_memset(msg, 0, sizeof(*msg));
 
-		Com_memcpy(&pos, data, 2);
-		
+		Com_memcpy(&pos, data, sizeof(pos));
+		data += 1;
+
 		msg->t = NM_MSG_HANDSHAKE;
-		msg->handshake.srv_pos = (nmPosition_t)COM_NTOL_U16(pos);
+		msg->handshake.srv_pos = (nmPosition_t)pos;
 
 		if(msg->handshake.srv_pos >= NM_POS_MAX)
 		{
@@ -261,10 +292,10 @@ static bool_t parse_handshake_reply(const byte_t *data, size_t len, nmMsg_t	*msg
 static bool_t parse_enter(const byte_t *data, size_t len, nmMsg_t	*msg)
 {
 
-		uint_32_t		src_x_fullscreen;
-		uint_32_t		src_y_fullscreen;
-		int_32_t		x;
-		int_32_t		y;
+		uint_16_t		src_x_fullscreen;
+		uint_16_t		src_y_fullscreen;
+		int_16_t		x;
+		int_16_t		y;
 
 		Com_ASSERT(data != NULL && msg != NULL);
 		
@@ -274,24 +305,24 @@ static bool_t parse_enter(const byte_t *data, size_t len, nmMsg_t	*msg)
 		}
 
 		Com_memcpy(&src_x_fullscreen, data, sizeof(src_x_fullscreen));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&src_y_fullscreen, data, sizeof(src_y_fullscreen));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&x, data, sizeof(x));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&y, data, sizeof(y));
-		data += 4;
+		data += 2;
 
 
 		Com_memset(msg, 0, sizeof(*msg));
 		msg->t = NM_MSG_ENTER;
-		msg->enter.src_x_fullscreen = COM_NTOL_U32(src_x_fullscreen);
-		msg->enter.src_y_fullscreen = COM_NTOL_U32(src_y_fullscreen);
-		msg->enter.x = COM_NTOL_32(x);
-		msg->enter.y = COM_NTOL_32(y);
+		msg->enter.src_x_fullscreen = COM_NTOL_U16(src_x_fullscreen);
+		msg->enter.src_y_fullscreen = COM_NTOL_U16(src_y_fullscreen);
+		msg->enter.x = COM_NTOL_16(x);
+		msg->enter.y = COM_NTOL_16(y);
 
 		return true;
 }
@@ -299,10 +330,10 @@ static bool_t parse_enter(const byte_t *data, size_t len, nmMsg_t	*msg)
 
 static bool_t parse_leave(const byte_t *data, size_t len, nmMsg_t	*msg)
 {
-		uint_32_t		src_x_fullscreen;
-		uint_32_t		src_y_fullscreen;
-		int_32_t		x;
-		int_32_t		y;
+		uint_16_t		src_x_fullscreen;
+		uint_16_t		src_y_fullscreen;
+		int_16_t		x;
+		int_16_t		y;
 
 		Com_ASSERT(data != NULL && msg != NULL);
 		
@@ -312,36 +343,37 @@ static bool_t parse_leave(const byte_t *data, size_t len, nmMsg_t	*msg)
 		}
 
 		Com_memcpy(&src_x_fullscreen, data, sizeof(src_x_fullscreen));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&src_y_fullscreen, data, sizeof(src_y_fullscreen));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&x, data, sizeof(x));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&y, data, sizeof(y));
-		data += 4;
+		data += 2;
 
 
 		Com_memset(msg, 0, sizeof(*msg));
 		msg->t = NM_MSG_LEAVE;
-		msg->leave.src_x_fullscreen = COM_NTOL_U32(src_x_fullscreen);
-		msg->leave.src_y_fullscreen = COM_NTOL_U32(src_y_fullscreen);
-		msg->leave.x = COM_NTOL_32(x);
-		msg->leave.y = COM_NTOL_32(y);
+		msg->leave.src_x_fullscreen = COM_NTOL_U16(src_x_fullscreen);
+		msg->leave.src_y_fullscreen = COM_NTOL_U16(src_y_fullscreen);
+		msg->leave.x = COM_NTOL_16(x);
+		msg->leave.y = COM_NTOL_16(y);
 
 
 		return true;
 }
 
 
+
 static bool_t parse_mouse(const byte_t *data, size_t len, nmMsg_t	*msg)
 {
-		uint_32_t		msg_code;
-		int_32_t		x;
-		int_32_t		y;
-		uint_32_t		mouse_data;
+		uint_16_t		msg_code;
+		int_16_t		x;
+		int_16_t		y;
+		int_16_t		mouse_data;
 
 		Com_ASSERT(data != NULL && msg != NULL);
 
@@ -352,24 +384,24 @@ static bool_t parse_mouse(const byte_t *data, size_t len, nmMsg_t	*msg)
 
 
 		Com_memcpy(&msg_code, data, sizeof(msg_code));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&x, data, sizeof(x));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&y, data, sizeof(y));
-		data += 4;
+		data += 2;
 
 		Com_memcpy(&mouse_data, data, sizeof(mouse_data));
-		data += 4;
+		data += 2;
 
 
 		Com_memset(msg, 0, sizeof(*msg));
 		msg->t = NM_MSG_MOUSE;
-		msg->mouse.msg = COM_NTOL_U32(msg_code);
-		msg->mouse.x = COM_NTOL_32(x);
-		msg->mouse.y = COM_NTOL_32(y);
-		msg->mouse.data = COM_NTOL_U32(mouse_data);
+		msg->mouse.msg = COM_NTOL_U16(msg_code);
+		msg->mouse.x = COM_NTOL_16(x);
+		msg->mouse.y = COM_NTOL_16(y);
+		msg->mouse.data = COM_NTOL_16(mouse_data);
 
 
 		return true;
@@ -395,7 +427,7 @@ static bool_t parse_keybd(const byte_t *data, size_t len, nmMsg_t	*msg)
 		scan = *data;
 		data += 1;
 
-		is_keydown = (bool_t)*data;
+		is_keydown = *data != 0 ? true : false; /*Suppress Warning*/
 		data += 1;
 
 		Com_memset(msg, 0, sizeof(*msg));
@@ -413,40 +445,43 @@ static bool_t parse_keybd(const byte_t *data, size_t len, nmMsg_t	*msg)
 
 bool_t	NM_ParseFromBuffer(const byte_t *data, size_t len, nmMsg_t	*msg)
 {
-		uint_16_t		package_type;
+		uint_8_t		package_type;
 		const byte_t	*p;
 		Com_ASSERT(data != NULL && msg != NULL);
 
-		if(len < 2)
+		if(len < 1)
 		{
 				return false;
 		}
 		
 		p = data;
-
-		Com_memcpy(&package_type, p, 2);
-		p += 2;
-		package_type = COM_NTOL_U16(package_type);
+		
+		package_type = (uint_8_t)*p;
+		p += 1;
+		
+		
 
 		switch(package_type)
 		{
+		case NM_MSG_KEEPALIVE:
+				return parse_keepalive(p, len - 1, msg);
 		case NM_MSG_HANDSHAKE:
-				return parse_handshake(p, len - 2, msg);
+				return parse_handshake(p, len - 1, msg);
 				break;
 		case NM_MSG_HANDSHAKE_REPLY:
-				return parse_handshake_reply(p, len - 2, msg);
+				return parse_handshake_reply(p, len - 1, msg);
 				break;
 		case NM_MSG_ENTER:
-				return parse_enter(p, len - 2, msg);
+				return parse_enter(p, len - 1, msg);
 				break;
 		case NM_MSG_LEAVE:
-				return parse_leave(p, len - 2, msg);
+				return parse_leave(p, len - 1, msg);
 				break;
 		case NM_MSG_MOUSE:
-				return parse_mouse(p, len - 2, msg);
+				return parse_mouse(p, len - 1, msg);
 				break;
 		case NM_MSG_KEYBOARD:
-				return parse_keybd(p, len - 2, msg);
+				return parse_keybd(p, len - 1, msg);
 				break;
 		default:
 				Com_error(COM_ERR_WARNING, L"Receive invalid msg type : %d\r\n", package_type);
