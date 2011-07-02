@@ -276,8 +276,8 @@ static void	client_io_thread_func(void *data)
 
 				if(sel_ret == SOCKET_ERROR)
 				{
-						Com_error(COM_ERR_WARNING, L"Internal error : select failed (%d)\r\n", WSAGetLastError());
-						continue;
+						Com_error(COM_ERR_FATAL, L"Internal error : select failed (%d)\r\n", WSAGetLastError());
+						/*continue;*/
 				}
 				
 				if(Com_GetTime_Milliseconds() - time_mark >= NM_TIMER_TICK)

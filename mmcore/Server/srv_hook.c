@@ -3,17 +3,6 @@
 
 MM_NAMESPACE_BEGIN
 
-bool_t Hook_Srv_Init(const hkSrvInit_t *init)
-{
-		Com_UNUSED(init);
-		return true;
-}
-
-bool_t Hook_Srv_UnInit()
-{
-		return true;
-}
-
 
 
 static bool_t			  __g_is_started = false;
