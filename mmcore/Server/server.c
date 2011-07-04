@@ -27,7 +27,7 @@ bool_t Srv_UnInit()
 /*****************************************************************************************************************/
 
 
-
+#if(0)
 
 
 static SOCKET			__g_srv_sockfd = INVALID_SOCKET;
@@ -357,6 +357,7 @@ static bool_t mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu
 		Com_UnLockMutex(&__g_client_lock);
 		return is_ok;
 }
+#endif
 
 
 
