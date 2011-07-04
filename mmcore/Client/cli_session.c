@@ -183,11 +183,18 @@ bool_t		SS_RecvData(ss_t *ss)		/*´ÓsockfdÒÔ·Ç×èÈû·½Ê½½ÓÊÕ¶Ô¶ËÊı¾İ£¬·ÅÈëin_bufÊı¾
 				return false;
 		}
 
+		if(available <= 0)
+		{
+				return false;
+		}
+
 		Com_LockMutex(&ss->in_lock);
 		
 
 		buf = Com_AllocBuffer(ss->in_buf, (int)available);
 		rn = recv(ss->sockfd, (char*)buf, available, 0);
+
+		
 
 		if(rn != (int)available)
 		{
