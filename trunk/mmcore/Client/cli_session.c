@@ -1,6 +1,6 @@
 
 #include "cli_hook.h"
-#include "session.h"
+#include "cli_session.h"
 
 MM_NAMESPACE_BEGIN
 
@@ -65,7 +65,7 @@ ss_t*		SS_ConnectSession(nmPosition_t	pos, const wchar_t			*ip, uint_16_t		port)
 		ss->sockfd = fd;
 		ss->in_buf = Com_CreateBuffer(1024);
 		Com_InitMutex(&ss->in_lock);
-		ss->recv_state = SS_RECV_WAIT_HEADER;
+		ss->recv_state = NM_RECV_WAIT_HEADER;
 		ss->remain_len = NM_PACKAGE_HEADER_LENGTH;
 		ss->last_recv_stamp = Com_GetTime_Milliseconds();
 		
@@ -205,7 +205,7 @@ RECHECK_POINT:
 
 				switch(ss->recv_state)
 				{
-				case SS_RECV_WAIT_HEADER:
+				case NM_RECV_WAIT_HEADER:
 				{
 						uint_16_t package_len;
 
@@ -222,14 +222,14 @@ RECHECK_POINT:
 										goto END_POINT;
 								}else
 								{
-										ss->recv_state = SS_RECV_WAIT_PACKAGE;
+										ss->recv_state = NM_RECV_WAIT_PACKAGE;
 										ss->remain_len = package_len;
 										goto RECHECK_POINT;
 								}
 						}
 				}
 						break;
-				case SS_RECV_WAIT_PACKAGE:
+				case NM_RECV_WAIT_PACKAGE:
 				{
 						if(ss->remain_len <= Com_GetBufferAvailable(ss->in_buf))
 						{
@@ -239,7 +239,7 @@ RECHECK_POINT:
 								
 								if(is_ok)
 								{
-										ss->recv_state = SS_RECV_WAIT_HEADER;
+										ss->recv_state = NM_RECV_WAIT_HEADER;
 										ss->remain_len = NM_PACKAGE_HEADER_LENGTH;
 										goto RECHECK_POINT;
 								}else

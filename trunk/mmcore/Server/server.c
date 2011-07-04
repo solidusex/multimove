@@ -1,7 +1,7 @@
 
 #include "srv_hook.h"
 #include "server.h"
-
+#include "srv_session.h"
 
 MM_NAMESPACE_BEGIN
 

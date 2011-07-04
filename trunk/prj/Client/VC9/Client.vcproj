@@ -439,19 +439,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\mmcore\Client\cli_session.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Client\cli_session.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\mmcore\Client\client.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\mmcore\Client\client.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Client\session.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Client\session.h"
 				>
 			</File>
 		</Filter>

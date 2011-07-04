@@ -105,6 +105,11 @@ bool_t	NM_ParseFromBuffer(const byte_t *data, size_t len, nmMsg_t	*msg);
 
 
 
+typedef enum
+{
+		NM_RECV_WAIT_HEADER,
+		NM_RECV_WAIT_PACKAGE
+}nmRecvState_t;
 
 
 

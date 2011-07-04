@@ -1,7 +1,7 @@
 
 #include "cli_hook.h"
 #include "client.h"
-#include "session.h"
+#include "cli_session.h"
 
 MM_NAMESPACE_BEGIN
 

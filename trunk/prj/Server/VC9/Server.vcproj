@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\..\..\mmcore"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -56,7 +56,7 @@
 				AssemblerOutput="2"
 				WarningLevel="4"
 				DebugInformationFormat="4"
-				CompileAs="1"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -134,7 +134,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\..\..\mmcore"
 				PreprocessorDefinitions="WIN64;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -145,7 +145,7 @@
 				AssemblerOutput="2"
 				WarningLevel="4"
 				DebugInformationFormat="4"
-				CompileAs="1"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -226,7 +226,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\..\..\mmcore"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -320,7 +320,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories=""
+				AdditionalIncludeDirectories="..\..\..\mmcore"
 				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -330,7 +330,7 @@
 				AssemblerOutput="0"
 				WarningLevel="4"
 				DebugInformationFormat="3"
-				CompileAs="1"
+				CompileAs="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -439,19 +439,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\mmcore\Server\session.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Server\session.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\mmcore\Server\srv_hook.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\mmcore\Server\srv_hook.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\srv_session.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\srv_session.h"
 				>
 			</File>
 		</Filter>
@@ -464,6 +464,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\mmcore\NetMsg\netmsg.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Run"
+			>
+			<File
+				RelativePath=".\main.cpp"
 				>
 			</File>
 		</Filter>
