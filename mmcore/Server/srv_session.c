@@ -165,6 +165,7 @@ END_POINT:
 
 }
 
+
 bool_t			SS_OnRecvData(srvSession_t *ss)
 {
 		int rn;
@@ -324,7 +325,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 				break;
 		case NM_MSG_MOUSE:
 		{
-
+				
 				if(!ss->is_handshaked)
 				{
 						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received NM_MSG_MOUSE request before NM_MSG_ENTER, connection terminated\r\n", ss->ip, ss->port);
@@ -339,8 +340,43 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						goto END_POINT;
 				}
 
-				Com_printf(L"On Mouse Msg\r\n");
-#if(0)
+
+				if(msg.mouse.msg == WM_MOUSEMOVE)
+				{
+
+						bool_t need_send_leave = false;
+						int src_x_fullscrenn, src_y_fullscreen;
+						POINT pt;
+						src_x_fullscrenn = GetSystemMetrics(SM_CXSCREEN);
+						src_y_fullscreen = GetSystemMetrics(SM_CYSCREEN);
+				
+						GetCursorPos(&pt);
+				
+						if(ss->pos == NM_POS_LEFT && pt.x >= src_x_fullscrenn && msg.mouse.x > 0)
+						{
+								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
+								need_send_leave = true;
+						}
+
+						if(ss->pos == NM_POS_RIGHT && pt.x <= 0 && msg.mouse.x < 0)
+						{
+								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
+								need_send_leave = true;
+						}
+
+						if(need_send_leave)
+						{
+								nmMsg_t leave_msg;
+								leave_msg.t = NM_MSG_LEAVE;
+								leave_msg.leave.src_x_fullscreen = src_x_fullscrenn;
+								leave_msg.leave.src_y_fullscreen = src_y_fullscreen;
+								leave_msg.leave.x = pt.x;
+								leave_msg.leave.y = pt.y;
+								SS_SendMouseLeave(ss, &leave_msg);
+						}
+				}
+				
+
 				switch(msg.mouse.msg)
 				{
 				case WM_MOUSEMOVE:
@@ -383,7 +419,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						is_ok = true;
 						break;
 				}
-#endif
+
 				is_ok = true;
 		}
 				break;
