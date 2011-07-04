@@ -30,7 +30,7 @@ static hkCliState_t __g_state = HK_STATE_STOP;
 static nmPosition_t __g_curr_pos = NM_POS_MAX;
 
 
-static cmSpinLock_t		__g_lock;
+static cmMutex_t		__g_lock;
 static cmThread_t		*__g_thread = NULL;
 
 static POINT			__g_prev_pt;
@@ -47,12 +47,13 @@ static void	hook_thread_func(void *data);
 
 bool_t	Hook_Cli_Start()
 {
+
 		cmEvent_t *event;
 		if(Hook_Cli_IsStarted())
 		{
 				return false;
 		}
-		
+		Com_InitMutex(&__g_lock);
 		__g_thread = NULL;
 		Com_memset(&__g_entry, 0, sizeof(__g_entry));
 		__g_mouse_hook = NULL;
@@ -103,6 +104,7 @@ bool_t	Hook_Cli_Stop()
 		__g_hook_thread_id = 0;
 		__g_state = HK_STATE_STOP;
 		__g_curr_pos = NM_POS_MAX;
+		Com_UnInitMutex(&__g_lock);
 		
 		return true;
 }
@@ -110,11 +112,7 @@ bool_t	Hook_Cli_Stop()
 
 bool_t	Hook_Cli_IsStarted()
 {
-		hkCliState_t	s;
-		Com_LockSpinLock(&__g_lock);
-		s = __g_state;
-		Com_UnLockSpinLock(&__g_lock);
-		return s != HK_STATE_STOP ? true : false;
+		return __g_state != HK_STATE_STOP ? true : false;
 }
 
 
@@ -183,7 +181,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 		
 		mouse_stu = (MSLLHOOKSTRUCT*)l;
 
-		
+		Com_printf(L"On on_normal_mouse_action\r\n");
 		Com_ASSERT(mouse_stu != NULL);
 		
 		switch(w)
@@ -194,7 +192,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 				{
 						Com_printf(L"Shift trigger point on : (%d:%d) to left\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
-						Com_LockSpinLock(&__g_lock);
+						Com_LockMutex(&__g_lock);
 
 						if(__g_entry[NM_POS_LEFT].handler != NULL)
 						{
@@ -215,7 +213,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 								
 								Com_printf(L"Shift to left side\r\n");
 						}
-						Com_UnLockSpinLock(&__g_lock);
+						Com_UnLockMutex(&__g_lock);
 
 						return CallNextHookEx(__g_mouse_hook, code, w, l);
 				
@@ -223,7 +221,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 				{
 						Com_printf(L"Shift trigger point on : (%d:%d) to right\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
-						Com_LockSpinLock(&__g_lock);
+						Com_LockMutex(&__g_lock);
 
 						if(__g_entry[NM_POS_RIGHT].handler != NULL)
 						{
@@ -242,7 +240,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 								
 								Com_printf(L"Shift to right side\r\n");
 						}
-						Com_UnLockSpinLock(&__g_lock);
+						Com_UnLockMutex(&__g_lock);
 
 						return CallNextHookEx(__g_mouse_hook, code, w, l);
 				}else
@@ -264,62 +262,101 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 }
 
 
-
-
 static LRESULT on_remote_mouse_action(int code, WPARAM w, LPARAM l)
 {
 
 		int x_full_screen, y_full_screen;
 		MSLLHOOKSTRUCT *mouse_stu;
-		bool_t	need_send_msg = true;
-		bool_t	need_call_next = false;
-		int		relative_x, relative_y;
-
 		
+		int		relative_x, relative_y;
+		bool_t need_send_msg, need_call_next;
+		//Com_printf(L"On on_remote_mouse_action\r\n");
 		x_full_screen = GetSystemMetrics(SM_CXSCREEN);
 		y_full_screen = GetSystemMetrics(SM_CYSCREEN);
 		
 		mouse_stu = (MSLLHOOKSTRUCT*)l;
 		
 		Com_ASSERT(mouse_stu != NULL);
+		
+		need_send_msg = true;
+		need_call_next = true;
+		relative_x = 0;
+		relative_y = 0;
 
 
-		Com_LockSpinLock(&__g_lock);
+		Com_LockMutex(&__g_lock);
+		
+		switch(w)
+		{
+		case WM_MOUSEMOVE:
+		{
+				
+				if(mouse_stu->pt.x >= x_full_screen)
+				{
+						__g_prev_pt.x = 0;
+						__g_prev_pt.y = mouse_stu->pt.y;
+						mouse_event(MOUSEEVENTF_MOVE, -x_full_screen, 0, 0, 0);
+						need_send_msg = false;
+						need_call_next = false;
+				}else  if(mouse_stu->pt.x <= 0)
+				{
+						__g_prev_pt.x = x_full_screen;
+						__g_prev_pt.y = mouse_stu->pt.y;
+						mouse_event(MOUSEEVENTF_MOVE, x_full_screen, 0, 0, 0);
+						need_send_msg = false;
+						need_call_next = false;
+				}else if(mouse_stu->pt.y >= y_full_screen)
+				{
+						__g_prev_pt.x = mouse_stu->pt.x;
+						__g_prev_pt.y = 0;
+						mouse_event(MOUSEEVENTF_MOVE, 0, -y_full_screen, 0, 0);
+						need_send_msg = false;
+						need_call_next = false;
+				}else if(mouse_stu->pt.y <= 0)
+				{
+						__g_prev_pt.x = mouse_stu->pt.x;
+						__g_prev_pt.y = y_full_screen;
+						mouse_event(MOUSEEVENTF_MOVE, 0, y_full_screen, 0, 0);
+						need_send_msg = false;
+						need_call_next = false;
+				}else
+				{
+						relative_x = mouse_stu->pt.x - __g_prev_pt.x;
+						relative_y = mouse_stu->pt.y - __g_prev_pt.y;
+						
+						__g_prev_pt.x = mouse_stu->pt.x;
+						__g_prev_pt.y = mouse_stu->pt.y;
 
-		if(mouse_stu->pt.x >= x_full_screen)
-		{
-				__g_prev_pt.x = 0;
-				__g_prev_pt.y = mouse_stu->pt.y;
-				mouse_event(MOUSEEVENTF_MOVE, -(x_full_screen), 0, 0, 0);
-				need_send_msg = false;
-		}else  if(mouse_stu->pt.x <= 0)
-		{
-				__g_prev_pt.x = x_full_screen;
-				__g_prev_pt.y = mouse_stu->pt.y;
-				mouse_event(MOUSEEVENTF_MOVE, x_full_screen, 0, 0, 0);
-				need_send_msg = false;
-		}else if(mouse_stu->pt.y >= y_full_screen)
-		{
-				__g_prev_pt.x = mouse_stu->pt.x;
-				__g_prev_pt.y = 0;
-				mouse_event(MOUSEEVENTF_MOVE, 0, -(y_full_screen), 0, 0);
-				need_send_msg = false;
-		}else if(mouse_stu->pt.y <= 0)
-		{
-				__g_prev_pt.x = mouse_stu->pt.x;
-				__g_prev_pt.y = y_full_screen;
-				mouse_event(MOUSEEVENTF_MOVE, 0, y_full_screen, 0, 0);
-				need_send_msg = false;
+						need_send_msg = true;
+						need_call_next = true;
+
+
+						//Com_printf(L"Remote mode relative move : (%d : %d)\r\n", relative_x, relative_y);
+
+						
+				}
+
+
 		}
-		
-		relative_x = mouse_stu->pt.x - __g_prev_pt.x;
-		relative_y = mouse_stu->pt.y - __g_prev_pt.y;
+				break;
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_MOUSEWHEEL:
+		case WM_MOUSEHWHEEL:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+				need_send_msg = true;
+				need_call_next = false;
+				break;
+		default:
+				need_send_msg = false;
+				need_call_next = false;
+				break;
+		}
 
-		Com_UnLockSpinLock(&__g_lock);
+		Com_UnLockMutex(&__g_lock);
 
-		Com_printf(L"Remote mode relative move : (%d : %d)\r\n", relative_x, relative_y);
-		
-		
+
 		if(need_send_msg)
 		{
 		
@@ -331,14 +368,10 @@ static LRESULT on_remote_mouse_action(int code, WPARAM w, LPARAM l)
 						msg.mouse.y = relative_y;
 						msg.mouse.data = mouse_stu->mouseData;
 						msg.mouse.msg = (uint_32_t)w;
-						
+
 						__g_entry[__g_curr_pos].handler(&msg, __g_entry[__g_curr_pos].ctx);
 				}
-		}else
-		{
-
 		}
-
 
 		return need_call_next ? CallNextHookEx(__g_mouse_hook, code, w, l) : 1;
 }
@@ -353,9 +386,9 @@ static LRESULT CALLBACK mouse_hook_func(int code, WPARAM w, LPARAM l)
 				return CallNextHookEx(__g_mouse_hook, code, w, l);
 		}
 
-		Com_LockSpinLock(&__g_lock);
+		Com_LockMutex(&__g_lock);
 		s = __g_state;
-		Com_UnLockSpinLock(&__g_lock);
+		Com_UnLockMutex(&__g_lock);
 		
 
 		
@@ -373,7 +406,7 @@ static LRESULT CALLBACK mouse_hook_func(int code, WPARAM w, LPARAM l)
 				break;
 		default:
 				Com_error(COM_ERR_FATAL, L"%d is not valid state\r\n", s);
-				return CallNextHookEx(__g_keyboard_hook, code, w, l); //disable warning
+				return CallNextHookEx(__g_mouse_hook, code, w, l); //disable warning
 				break;
 		}
 }
@@ -390,9 +423,9 @@ static LRESULT CALLBACK keyboard_hook_func(int code, WPARAM w, LPARAM l)
 				return CallNextHookEx(__g_keyboard_hook, code, w, l);
 		}
 		
-		Com_LockSpinLock(&__g_lock);
+		Com_LockMutex(&__g_lock);
 		s = __g_state;
-		Com_UnLockSpinLock(&__g_lock);
+		Com_UnLockMutex(&__g_lock);
 		
 
 
@@ -441,10 +474,10 @@ bool_t	Hook_Cli_RegisterHandler(nmPosition_t	pos, void	*ctx, hkMsgHander_t	on_ms
 				return false;
 		}
 		
-		Com_LockSpinLock(&__g_lock);
+		Com_LockMutex(&__g_lock);
 		__g_entry[pos].handler = on_msg;
 		__g_entry[pos].ctx = ctx;
-		Com_UnLockSpinLock(&__g_lock);
+		Com_UnLockMutex(&__g_lock);
 		return true;
 }
 
@@ -465,10 +498,10 @@ bool_t	Hook_Cli_UnRegisterHandler(nmPosition_t	pos)
 				return false;
 		}
 
-		Com_LockSpinLock(&__g_lock);
+		Com_LockMutex(&__g_lock);
 		__g_entry[pos].handler = NULL;
 		__g_entry[pos].ctx = NULL;
-		Com_UnLockSpinLock(&__g_lock);
+		Com_UnLockMutex(&__g_lock);
 		return true;
 }
 
@@ -485,9 +518,9 @@ bool_t	Hook_Cli_ControlReturn()
 				return false;
 		}
 
-		Com_LockSpinLock(&__g_lock);
+		Com_LockMutex(&__g_lock);
 		__g_state = HK_STATE_NORMAL;
-		Com_UnLockSpinLock(&__g_lock);
+		Com_UnLockMutex(&__g_lock);
 
 		return true;
 }

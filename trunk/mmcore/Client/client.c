@@ -360,7 +360,8 @@ static void	client_io_thread_func(void *data)
 static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx)
 {
 		Com_ASSERT(ctx != NULL && msg != NULL);
-		
+		//Com_printf(L"On hook_dispatch\r\n");
+
 		switch(msg->t)
 		{
 		case NM_MSG_KEEPALIVE:

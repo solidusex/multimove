@@ -358,38 +358,46 @@ bool_t		SS_SendKeyboardMsg(ss_t *ss, const nmMsg_t *msg)
 
 bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
 {
+		bool_t is_ok;
 		nmMsg_t msg;
 		Com_ASSERT(ss != NULL && data != NULL);
-
+		
 		if(!NM_ParseFromBuffer(data, length, &msg))
 		{
 				Com_error(COM_ERR_WARNING, L"Session (%s:%d) received a bad net package, connection terminated\r\n", ss->ip, ss->port);
 				return false;
 		}
 
+		is_ok = true;
+
 		switch(msg.t)
 		{
 		case NM_MSG_KEEPALIVE:
-				return true;
+				is_ok = true;
+				break;
 		case NM_MSG_HANDSHAKE_REPLY:
 				ss->is_handshaked = true;
+				is_ok = true;
+				break;
 		case NM_MSG_LEAVE:
 		{
-
+				int x_full_screen, y_full_screen;
+				x_full_screen = GetSystemMetrics(SM_CXSCREEN);
+				y_full_screen = GetSystemMetrics(SM_CYSCREEN);
 				if(!ss->is_handshaked)
 				{
 						Com_error(COM_ERR_WARNING, L"Session (%s:%d) received NM_MSG_LEAVE request before handshake, connection terminated\r\n", ss->ip, ss->port);
-						return false;
+						is_ok = false;
+						goto END_POINT;
 				}
 
 				if(!ss->is_active)
 				{
 						Com_error(COM_ERR_WARNING, L"Session (%s:%d) received NM_MSG_LEAVE request in non-active mode, connection terminated\r\n", ss->ip, ss->port);
-						return false;
+						goto END_POINT;
 				}
 				
-				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 1, (DWORD)(msg.leave.y * 65535 / msg.leave.src_y_fullscreen), 0, 0);
-
+				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, ss->for_position == NM_POS_LEFT ? 2 * 65535 / x_full_screen : (x_full_screen - 2) * 65535 / x_full_screen, (DWORD)(msg.leave.y * 65535 / msg.leave.src_y_fullscreen), 0, 0);
 				Hook_Cli_ControlReturn();
 
 		}
@@ -400,10 +408,12 @@ bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
 		case NM_MSG_ENTER:
 		default:
 				Com_error(COM_ERR_WARNING, L"Session (%s:%d) receive a bad msg type, connection terminated\r\n", ss->ip, ss->port);
-				return false;
+				is_ok = false;
+				goto END_POINT;
 		}
 
-		return true;
+END_POINT:
+		return is_ok;
 }
 
 
