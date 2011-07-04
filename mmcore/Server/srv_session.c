@@ -19,6 +19,7 @@ srvSession_t*	SS_OnClientSession(SOCKET cli_fd, const struct sockaddr_in *addr)
 				Com_swprintf(ss->ip, 256, L"%S", inet_ntoa(addr->sin_addr));
 		}
 
+		
 		ss->port = ntohs(addr->sin_port);
 
 		ss->out_buf = Com_CreateBuffer(1024);
@@ -37,6 +38,10 @@ srvSession_t*	SS_OnClientSession(SOCKET cli_fd, const struct sockaddr_in *addr)
 		
 		ss->is_entered = false;
 		ss->is_handshaked = false;
+
+
+		Com_printf(L"Client Login %s:%d\r\n", ss->ip, ss->port);
+
 		return ss;
 }
 
@@ -45,6 +50,8 @@ void			SS_CloseClientSession(srvSession_t *ss)
 {
 
 		Com_ASSERT(ss != NULL);
+
+		Com_printf(L"Client Logoff %s:%d\r\n", ss->ip, ss->port);
 				
 		Com_DestroyBuffer(ss->in_buf);
 		ss->in_buf = NULL;
@@ -280,7 +287,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						ss->is_handshaked = true;
 						ss->pos = msg.handshake.srv_pos;
 						SS_SendHandShakeReply(ss);
-						return true;
+						is_ok = true;
 				}
 				break;
 		case NM_MSG_ENTER:
@@ -306,7 +313,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						goto END_POINT;
 				}
 				
-				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 1, (DWORD)(msg.enter.y * 65535 / msg.enter.src_y_fullscreen), 0, 0);
+				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 100, (DWORD)(msg.enter.y * 65535 / msg.enter.src_y_fullscreen), 0, 0);
 				ss->is_entered = true;
 		}
 				break;
@@ -315,12 +322,12 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 
 				if(!ss->is_handshaked)
 				{
-						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received NM_MSG_MOUSE request before handshake, connection terminated\r\n", ss->ip, ss->port);
+						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received NM_MSG_MOUSE request before NM_MSG_ENTER, connection terminated\r\n", ss->ip, ss->port);
 						is_ok = false;
 						goto END_POINT;
 				}
 
-				if(ss->is_entered)
+				if(!ss->is_entered)
 				{
 						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received multi NM_MSG_MOUSE msg, connection terminated\r\n", ss->ip, ss->port);
 						is_ok = false;
@@ -426,253 +433,6 @@ bool_t			SS_OnTimer(srvSession_t *ss)
 		return true;
 
 }
-
-#if(0)
-
-
-
-static bool_t		OnTimer(srvClient_t *cli)
-{
-		Com_ASSERT(cli != NULL);
-
-		if(Com_GetTime_Milliseconds() - cli->last_in_stamp > KEEPALIVE_TIMEOUT)
-		{
-				return false;
-		}
-		
-
-		if(Com_GetTime_Milliseconds() - cli->last_out_stamp > KEEPALIVE_TIMEOUT - 500)
-		{
-				SendKeepAlive(cli);
-		}
-
-		return true;
-}
-
-
-/*
-		KeepAlive = 0, HandShake = 1, 
-		MouseEnter = 2, MouseEvent = 3, 
-		KeyboardEvent = 4
-*/
-
-
-static bool_t		HandleRecvData(srvClient_t *cli, const byte_t *data, size_t length)
-{
-		uint_16_t package_type;
-		const byte_t *p;
-		Com_ASSERT(cli != NULL && data != NULL && length >= 2);
-
-		if(length < sizeof(package_type))
-		{
-				return false;
-		}
-
-		p = data;
-
-		Com_memcpy((byte_t*)&package_type, p, sizeof(package_type));
-		p += sizeof(package_type);
-		length -= sizeof(package_type);
-
-		package_type = COM_NTOL_16(package_type);
-		
-		
-		switch(package_type)
-		{
-		case 0: /*keepalive*/
-				return true;
-		case 1: /*handshake 方向 LEFT == 0, RIGHT == 1 */
-		{
-				if(length < 1)
-				{
-						return false;
-				}
-
-				if(cli->is_handshake)
-				{
-						return false;
-				}
-				
-				switch(*p)
-				{
-				case 0:
-						cli->pos = SRV_LEFT_SRV;
-						cli->is_handshake = true;
-						SendHandShake(cli);
-						return true;
-						break;
-				case 1:
-						cli->pos = SRV_RIGHT_SRV;
-						cli->is_handshake = true;
-						SendHandShake(cli);
-						return true;
-				default:
-						return false;
-				}
-
-				
-		}
-				break;
-		case 2:/*MouseEnter*/
-		{
-				uint_32_t src_x_fullscreen;
-				uint_32_t src_y_fullscreen;
-				int_32_t  x;
-				int_32_t  y;
-				
-				if(!cli->is_handshake)
-				{
-						return false;
-				}
-				
-				Com_memcpy(&src_x_fullscreen, p, sizeof(src_x_fullscreen));
-				p += sizeof(src_x_fullscreen);
-				length -= sizeof(src_x_fullscreen);
-				src_x_fullscreen = COM_NTOL_U32(src_x_fullscreen);
-
-				Com_memcpy(&src_y_fullscreen, p, sizeof(src_y_fullscreen));
-				p += sizeof(src_y_fullscreen);
-				length -= sizeof(src_y_fullscreen);
-				src_x_fullscreen = COM_NTOL_U32(src_y_fullscreen);
-
-
-				Com_memcpy(&x, p, sizeof(x));
-				p += sizeof(x);
-				length -= sizeof(x);
-				y = COM_NTOL_32(x);
-
-				Com_memcpy(&y, p, sizeof(y));
-				p += sizeof(y);
-				length -= sizeof(y);
-				y = COM_NTOL_32(y);
-				
-				if(src_x_fullscreen == 0 || src_y_fullscreen == 0)
-				{
-						return false;
-				}
-				
-
-				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 1, (DWORD)( y * 65535 / src_y_fullscreen), 0, 0);
-				
-
-				return true;
-		}
-				break;
-		case 3:/*MouseEvent*/
-		{
-
-				uint_32_t msg;	/* 消息类型*/
-				int_32_t x;		/* 鼠标x轴坐标*/
-				int_32_t y;		/* 鼠标y轴坐标*/
-				int_32_t data;	/*特殊数据，例如滚轮偏移*/
-
-				if(!cli->is_handshake)
-				{
-						return false;
-				}
-
-				if(length < 16)
-				{
-						return false;
-				}
-				
-				Com_memcpy(&msg, p, sizeof(msg));
-				p += sizeof(msg);
-				length -= sizeof(msg);
-				msg = COM_NTOL_U32(msg);
-
-				Com_memcpy(&x, p, sizeof(x));
-				p += sizeof(x);
-				length -= sizeof(x);
-				x = COM_NTOL_32(x);
-
-				Com_memcpy(&y, p, sizeof(y));
-				p += sizeof(y);
-				length -= sizeof(y);
-				y = COM_NTOL_32(y);
-
-				Com_memcpy(&data, p, sizeof(data));
-				p += sizeof(data);
-				length -= sizeof(data);
-				data = COM_NTOL_32(data);
-
-				/***************************************************/
-				switch(msg)
-				{
-				case WM_MOUSEMOVE:
-				{
-						mouse_event(MOUSEEVENTF_MOVE, (DWORD)x, (DWORD)y, 0, 0);
-				}
-						return true;
-				case WM_LBUTTONDOWN:
-				{
-						mouse_event(MOUSEEVENTF_LEFTDOWN, 0,0, 0, 0);
-				}
-						return true;
-				case WM_LBUTTONUP:
-				{
-						mouse_event(MOUSEEVENTF_LEFTUP, 0,0, 0, 0);
-				}
-						return true;
-				case WM_RBUTTONDOWN:
-				{
-						mouse_event(MOUSEEVENTF_RIGHTDOWN, 0,0, 0, 0);
-				}
-						return true;
-				case WM_RBUTTONUP:
-				{
-						mouse_event(MOUSEEVENTF_RIGHTUP, 0,0, 0, 0);
-
-				}
-						return true;
-				case WM_MOUSEWHEEL:
-				{
-						mouse_event(MOUSEEVENTF_WHEEL, 0,0, (DWORD)data, 0);
-				}
-						return true;
-				case WM_MOUSEHWHEEL:
-				{
-						mouse_event(MOUSEEVENTF_HWHEEL, 0,0, (DWORD)data, 0);
-				}
-						return true;
-				default:
-						return false;
-						break;
-				}
-		}
-				break;
-		case 4:/*KeyboardEvent*/
-		{
-				byte_t vk, scan, is_keydown;
-
-				if(!cli->is_handshake)
-				{
-						return false;
-				}
-
-				if(length < 3)
-				{
-						return false;
-				}
-
-				vk = *p++;
-				scan = *p++;
-				is_keydown = *p++;
-
-				keybd_event(vk, scan, is_keydown ? 0 : KEYEVENTF_KEYUP, 0);
-
-				return true;
-		}
-				break;
-		default:/*坏包*/
-				return false;
-		}
-}
-
-
-
-#endif
-
 
 
 MM_NAMESPACE_END

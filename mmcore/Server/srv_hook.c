@@ -131,7 +131,7 @@ static void hook_thread_func(void *data)
 				}
 				TranslateMessage (&msg);
 				DispatchMessage (&msg);
-		};
+		}
 		
 		UnhookWindowsHookEx(__g_mouse_hook);
 		__g_mouse_hook = NULL;
