@@ -406,54 +406,6 @@ bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
 		return true;
 }
 
-#if(0)
-
-
-/*½ÓÊÕ*/
-bool_t		Cli_HandleRecvBuffer(cliSrv_t *srv, const byte_t *data, size_t length)
-{
-		uint_16_t package_type;
-		const byte_t *p;
-		Com_ASSERT(srv != NULL && data != NULL && length >= 2);
-
-		if(length < 2)
-		{
-				return false;
-		}
-
-		p = data;
-
-		Com_memcpy((byte_t*)&package_type, p, 2);
-		p += 2;
-		
-		package_type = COM_NTOL_16(package_type);
-
-		switch(package_type)
-		{
-		case 0: /*keepalive*/
-				Com_printf(L"On KeepAlive\r\n");
-				return true;
-		case 1: /*handshake reply*/
-				Com_printf(L"On handshake reply\r\n");
-				return true;
-		case 2:/*mouse leave*/
-				if(srv->is_active_side)
-				{
-
-						srv->is_active_side = false;
-						Hook_Cli_ControlReturn();
-				}
-				return true;
-		default:
-				return false;
-		}
-}
-
-
-
-#endif
-
-
 
 MM_NAMESPACE_END
 
