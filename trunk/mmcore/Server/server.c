@@ -1,5 +1,5 @@
 
-#include "srv_hook.h"
+//#include "srv_hook.h"
 #include "server.h"
 #include "srv_session.h"
 
@@ -37,7 +37,10 @@ static bool_t			__g_is_started = false;
 static cmMutex_t		__g_ss_lock;
 static srvSession_t		*__g_ss = NULL;
 
+/*
 static bool_t	mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu);
+*/
+
 static void		server_io_thread_func(void *data);
 
 
@@ -83,6 +86,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 		Com_InitMutex(&__g_ss_lock);
 		__g_ss = NULL;
 
+		/*
 		
 		if(!Hook_Srv_Start(mouse_event_handler))
 		{
@@ -91,6 +95,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 				fd = INVALID_SOCKET;
 				return false;
 		}
+		*/
 		
 		__g_srv_sockfd = fd;
 		__g_is_started = true;
@@ -109,8 +114,9 @@ bool_t	Srv_Stop()
 				return false;
 		}
 
-		
+		/*
 		Hook_Srv_Stop();
+		*/
 
 		__g_is_started = false;
 		Com_JoinThread(__g_working_thread);
@@ -304,7 +310,7 @@ HANDLE_END_POINT:
 
 
 
-
+#if(0)
 static bool_t mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu)
 {
 		bool_t is_ok;
@@ -383,6 +389,6 @@ static bool_t mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu
 		Com_UnLockMutex(&__g_ss_lock);
 		return is_ok;
 }
-
+#endif
 
 MM_NAMESPACE_END
