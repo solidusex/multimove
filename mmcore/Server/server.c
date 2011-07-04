@@ -27,15 +27,15 @@ bool_t Srv_UnInit()
 /*****************************************************************************************************************/
 
 
-#if(0)
+
 
 
 static SOCKET			__g_srv_sockfd = INVALID_SOCKET;
 static cmThread_t		*__g_working_thread = NULL;
 static bool_t			__g_is_started = false;
 
-static cmMutex_t		__g_client_lock;
-static srvClient_t		*__g_client = NULL;
+static cmMutex_t		__g_ss_lock;
+static srvSession_t		*__g_ss = NULL;
 
 static bool_t	mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu);
 static void		server_io_thread_func(void *data);
@@ -51,10 +51,12 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 		{
 				addr.sin_family = AF_INET;
 				addr.sin_addr.s_addr = INADDR_ANY;
+				Com_printf(L"Server bind any address\r\n");
 		}else
 		{
 				if(!Com_GetIPByHostName_V4(bind_ip, &addr))
 				{
+						Com_error(COM_ERR_WARNING, L"Can't get ip host information from %s\r\n", bind_ip);
 						return false;
 				}
 		}
@@ -65,26 +67,30 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 		
 		if(fd == INVALID_SOCKET)
 		{
+				Com_error(COM_ERR_WARNING, L"Server can not allocate a new socket handle : error code = %d\r\n", WSAGetLastError());
 				return false;
 		}
 
-		if(bind(fd, (struct sockaddr*)&addr, sizeof(addr)) != 0 || listen(fd, 15) != 0/* || Com_socket_nonblocking(fd, true) != 0*/)
+		if(bind(fd, (struct sockaddr*)&addr, sizeof(addr)) != 0 || listen(fd, 15) != 0)
 		{
 				closesocket(fd);
+				fd = INVALID_SOCKET;
+				Com_error(COM_ERR_WARNING, L"Server can not bind socket to address %s:%d : error code = %d\r\n", bind_ip == NULL ?  L"Any" : bind_ip, port, WSAGetLastError());
 				return false;
 		}
 
 
-		Com_InitMutex(&__g_client_lock);
-		__g_client = NULL;
+		Com_InitMutex(&__g_ss_lock);
+		__g_ss = NULL;
 
 		
 		if(!Hook_Srv_Start(mouse_event_handler))
 		{
+				Com_UnInitMutex(&__g_ss_lock);
 				closesocket(fd);
+				fd = INVALID_SOCKET;
 				return false;
 		}
-		
 		
 		__g_srv_sockfd = fd;
 		__g_is_started = true;
@@ -114,8 +120,8 @@ bool_t	Srv_Stop()
 		closesocket(__g_srv_sockfd);
 		__g_srv_sockfd = INVALID_SOCKET;
 
-		Com_UnInitMutex(&__g_client_lock);
-		__g_client = NULL;
+		Com_UnInitMutex(&__g_ss_lock);
+		__g_ss = NULL;
 		
 		return true;
 }
@@ -129,9 +135,6 @@ bool_t	Srv_IsStarted()
 
 
 
-#define RECHECK_STATE_TIMEOUT	1 * 1000
-#define TIMER_RESULTION			3 * 1000
-
 static bool_t	handle_client_control(SOCKET cli_fd, const struct sockaddr_in *addr);
 
 
@@ -141,7 +144,7 @@ static void	server_io_thread_func(void *data)
 		SOCKET cli_fd;
 		struct sockaddr_in addr;
 		int addr_len;
-		const uint_64_t timeout = RECHECK_STATE_TIMEOUT;
+		const uint_64_t timeout = NM_BLOCKING_TIMEOUT;
 		Com_UNUSED(data);
 		
 		while(Srv_IsStarted())
@@ -154,7 +157,7 @@ static void	server_io_thread_func(void *data)
 				{
 						if(WSAGetLastError() != WSAETIMEDOUT)
 						{
-								Com_error(COM_ERR_FATAL, L"Server internal error Com_accpet_timeout : == %d\r\n", WSAGetLastError());
+								Com_error(COM_ERR_FATAL, L"Server accept failed : error code = %d\r\n", WSAGetLastError());
 						}else
 						{
 								continue;
@@ -173,22 +176,23 @@ static void	server_io_thread_func(void *data)
 
 
 
-
 static bool_t	handle_client_control(SOCKET client_fd, const struct sockaddr_in *addr)
 {
 
 		bool_t is_ok;
-		uint_64_t		time_mark = TIMER_RESULTION;
+		uint_64_t		time_mark = Com_GetTime_Milliseconds();
 		Com_ASSERT(client_fd != INVALID_SOCKET && addr != NULL);
+		
+		Com_ASSERT(__g_ss == NULL);
 
-		Com_LockMutex(&__g_client_lock);
-		__g_client = CreateClient(client_fd, addr);
-		Com_UnLockMutex(&__g_client_lock);
+		Com_LockMutex(&__g_ss_lock);
+		__g_ss = SS_OnClientSession(client_fd, addr);
+		Com_UnLockMutex(&__g_ss_lock);
 
 		
 		is_ok = true;
 
-		while(Srv_IsStarted())
+		while(is_ok && Srv_IsStarted())
 		{
 				int ret;
 				struct timeval tv;
@@ -196,8 +200,8 @@ static bool_t	handle_client_control(SOCKET client_fd, const struct sockaddr_in *
 				struct fd_set *prd, *pwd, *pex;
 				size_t rd_cnt, wd_cnt, ex_cnt;
 				
-						
-				Com_LockMutex(&__g_client_lock);
+
+				Com_LockMutex(&__g_ss_lock);
 
 				FD_ZERO(&rd_set);
 				FD_ZERO(&wd_set);
@@ -207,14 +211,14 @@ static bool_t	handle_client_control(SOCKET client_fd, const struct sockaddr_in *
 				ex_cnt = 0;
 
 				tv.tv_sec = 0;
-				tv.tv_usec = RECHECK_STATE_TIMEOUT * 1000;
+				tv.tv_usec = NM_BLOCKING_TIMEOUT * 1000;
 				
-				FD_SET(__g_client->fd, &rd_set);
+				FD_SET(__g_ss->fd, &rd_set);
 				rd_cnt += 1;
 				
-				if(Com_GetBufferAvailable(__g_client->out_buf) > 0)
+				if(SS_HasDataToSend(__g_ss))
 				{
-						FD_SET(__g_client->fd, &wd_set);
+						FD_SET(__g_ss->fd, &wd_set);
 						wd_cnt += 1;
 				}
 				
@@ -222,81 +226,79 @@ static bool_t	handle_client_control(SOCKET client_fd, const struct sockaddr_in *
 				pwd = wd_cnt > 0 ? &wd_set : NULL;
 				pex = ex_cnt > 0 ? &ex_set : NULL;
 
-				Com_UnLockMutex(&__g_client_lock);
+				
+				Com_UnLockMutex(&__g_ss_lock);
 				
 
 
 				ret = select(0, prd, pwd, pex, &tv);
 
 
-				Com_LockMutex(&__g_client_lock);
 
-				Com_ASSERT(__g_client != NULL);
+/***********************************Handle Block******************************/
+				Com_LockMutex(&__g_ss_lock);
+
+				Com_ASSERT(__g_ss != NULL);
 
 				if(ret < 0)
 				{
-						Com_UnLockMutex(&__g_client_lock);
 						is_ok = false;
-						Com_error(COM_ERR_WARNING, L"handle_client_control : select (%d)\r\n", WSAGetLastError());
-						goto END_POINT;
+						Com_error(COM_ERR_WARNING, L"select has error : %d\r\n", WSAGetLastError());
+						goto HANDLE_END_POINT;
 				}
 				
 
-				if(Com_GetTime_Milliseconds() - time_mark >= TIMER_RESULTION)
+				if(Com_GetTime_Milliseconds() - time_mark >= NM_TIMER_TICK)
 				{
-						if(!OnTimer(__g_client))
+						if(!SS_OnTimer(__g_ss))
 						{
-								Com_UnLockMutex(&__g_client_lock);
 								is_ok = false;
-								goto END_POINT;
+								goto HANDLE_END_POINT;
 						}else
 						{
-								Com_UnLockMutex(&__g_client_lock);
 								time_mark = Com_GetTime_Milliseconds();
 						}
 				}
 
 				if(ret == 0)
 				{
-						Com_UnLockMutex(&__g_client_lock);
-						continue;
+						/*Timeout*/
+						goto HANDLE_END_POINT;
 				}else
 				{
-						if(FD_ISSET(__g_client->fd, &rd_set))
+						if(FD_ISSET(__g_ss->fd, &rd_set))
 						{
-								if(!RecvData(__g_client))
+								if(!SS_OnRecvData(__g_ss))
 								{
-										Com_UnLockMutex(&__g_client_lock);
 										is_ok = false;
-										goto END_POINT;
+										goto HANDLE_END_POINT;
 								}
 						}
 
-						if(FD_ISSET(__g_client->fd, &wd_set))
+						if(FD_ISSET(__g_ss->fd, &wd_set))
 						{
-								if(!SendData(__g_client))
+								if(!SS_OnSendData(__g_ss))
 								{
-										Com_UnLockMutex(&__g_client_lock);
 										is_ok = false;
-										goto END_POINT;
+										goto HANDLE_END_POINT;
 								}
 						}
-
-						Com_UnLockMutex(&__g_client_lock);
 				}
+HANDLE_END_POINT:
+				Com_UnLockMutex(&__g_ss_lock);
 		}
 		
-END_POINT:
-
-		Com_LockMutex(&__g_client_lock);
-		DestroyClient(__g_client);
-		__g_client = NULL;
-		Com_UnLockMutex(&__g_client_lock);
 
 
-
-		return false;
+		Com_LockMutex(&__g_ss_lock);
+		SS_CloseClientSession(__g_ss);
+		__g_ss = NULL;
+		Com_UnLockMutex(&__g_ss_lock);
+		
+		return is_ok;
 }
+
+
 
 
 
@@ -315,50 +317,66 @@ static bool_t mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu
 		x_full_screen = GetSystemMetrics(SM_CXSCREEN);
 		y_full_screen = GetSystemMetrics(SM_CYSCREEN);
 
+		
+		Com_LockMutex(&__g_ss_lock);
 
-		Com_LockMutex(&__g_client_lock);
+		if(__g_ss != NULL)
+		{
+				switch(msg_id)
+				{
+				case WM_MOUSEMOVE:
+				{
+						if(mouse_stu->pt.x <= 0 && __g_ss->pos == NM_POS_RIGHT)
+						{
+								
+								if(SS_IsEntered(__g_ss))
+								{
+										nmMsg_t msg;
+										msg.t = NM_MSG_LEAVE;
+										msg.leave.src_x_fullscreen = x_full_screen;
+										msg.leave.src_y_fullscreen = y_full_screen;
+										msg.leave.x = mouse_stu->pt.x;
+										msg.leave.y = mouse_stu->pt.y;
 
-		if(__g_client == NULL)
-		{
-				Com_UnLockMutex(&__g_client_lock);
-				return true;
-		}
+										Com_printf(L"Send mouse leave to session (%s:%d) on point (%d:%d)", __g_ss->ip, __g_ss->port, mouse_stu->pt.x, mouse_stu->pt.y);
+										SS_SendMouseLeave(__g_ss, &msg);
+								}
+								is_ok = true;
+						}else if(mouse_stu->pt.x >= x_full_screen && __g_ss->pos == NM_POS_LEFT)
+						{
+								if(SS_IsEntered(__g_ss))
+								{
+										nmMsg_t msg;
+										msg.t = NM_MSG_LEAVE;
+										msg.leave.src_x_fullscreen = x_full_screen;
+										msg.leave.src_y_fullscreen = y_full_screen;
+										msg.leave.x = mouse_stu->pt.x;
+										msg.leave.y = mouse_stu->pt.y;
 
-		switch(msg_id)
-		{
-		case WM_MOUSEMOVE:
-		{
-				if(mouse_stu->pt.x <= 0 && __g_client->pos == SRV_RIGHT_SRV)
-				{
-						Com_printf(L"SendMouseLeave On : (%d:%d)\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
-						SendMouseLeave(__g_client);
+										Com_printf(L"Send mouse leave to session (%s:%d) on point (%d:%d)", __g_ss->ip, __g_ss->port, mouse_stu->pt.x, mouse_stu->pt.y);
+										SS_SendMouseLeave(__g_ss, &msg);
+								}
+								is_ok = true;
+						}else
+						{
+								is_ok = true;
+						}
+				}
+						break;
+				case WM_LBUTTONDOWN:
+				case WM_LBUTTONUP:
+				case WM_MOUSEWHEEL:
+				case WM_MOUSEHWHEEL:
+				case WM_RBUTTONDOWN:
+				case WM_RBUTTONUP:
+				default:
 						is_ok = true;
-				}else if(mouse_stu->pt.x >= x_full_screen && __g_client->pos == SRV_LEFT_SRV)
-				{
-						Com_printf(L"SendMouseLeave On : (%d:%d)\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
-						SendMouseLeave(__g_client);
-						is_ok = true;
-				}else
-				{
-						is_ok = true;
+						break;
 				}
 		}
-				break;
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-		case WM_MOUSEWHEEL:
-		case WM_MOUSEHWHEEL:
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-		default:
-				is_ok = true;
-				break;
-		}
-		Com_UnLockMutex(&__g_client_lock);
+		Com_UnLockMutex(&__g_ss_lock);
 		return is_ok;
 }
-#endif
-
 
 
 MM_NAMESPACE_END
