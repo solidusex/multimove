@@ -179,6 +179,11 @@ bool_t			SS_OnRecvData(srvSession_t *ss)
 				return false;
 		}
 
+		if(available <= 0)
+		{
+				return false;
+		}
+
 		Com_LockMutex(&ss->in_lock);
 
 		buf = Com_AllocBuffer(ss->in_buf, (int)available);
@@ -329,11 +334,13 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 
 				if(!ss->is_entered)
 				{
-						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received multi NM_MSG_MOUSE msg, connection terminated\r\n", ss->ip, ss->port);
-						is_ok = false;
+						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received NM_MSG_MOUSE after msg NM_MSG_LEAVE, msg discard\r\n", ss->ip, ss->port);
+						is_ok = true; 
 						goto END_POINT;
 				}
 
+				Com_printf(L"On Mouse Msg\r\n");
+#if(0)
 				switch(msg.mouse.msg)
 				{
 				case WM_MOUSEMOVE:
@@ -376,6 +383,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						is_ok = true;
 						break;
 				}
+#endif
 				is_ok = true;
 		}
 				break;
@@ -388,13 +396,12 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						goto END_POINT;
 				}
 
-				if(ss->is_entered)
+				if(!ss->is_entered)
 				{
-						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received multi NM_MSG_MOUSE msg, connection terminated\r\n", ss->ip, ss->port);
-						is_ok = false;
+						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received NM_MSG_KEYBOARD after msg NM_MSG_LEAVE, msg discard\r\n", ss->ip, ss->port);
+						is_ok = true; 
 						goto END_POINT;
 				}
-
 						
 				keybd_event(msg.keyboard.vk, msg.keyboard.scan, msg.keyboard.is_keydown ? 0 : KEYEVENTF_KEYUP, 0);
 

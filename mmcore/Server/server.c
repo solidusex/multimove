@@ -165,6 +165,7 @@ static void	server_io_thread_func(void *data)
 				}else
 				{
 						handle_client_control(cli_fd, &addr);
+						shutdown(cli_fd, SD_BOTH);
 						closesocket(cli_fd);
 						cli_fd = INVALID_SOCKET;
 				}
