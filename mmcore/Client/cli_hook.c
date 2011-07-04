@@ -188,7 +188,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 		{
 		case WM_MOUSEMOVE:
 		{
-				if(mouse_stu->pt.x <= 0)
+				if(mouse_stu->pt.x < 0)
 				{
 						Com_printf(L"Shift trigger point on : (%d:%d) to left\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
@@ -217,7 +217,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 
 						return CallNextHookEx(__g_mouse_hook, code, w, l);
 				
-				}else if(mouse_stu->pt.x >= x_full_screen)
+				}else if(mouse_stu->pt.x > x_full_screen)
 				{
 						Com_printf(L"Shift trigger point on : (%d:%d) to right\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
