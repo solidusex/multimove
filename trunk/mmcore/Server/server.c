@@ -149,7 +149,7 @@ static void	server_io_thread_func(void *data)
 		
 		while(Srv_IsStarted())
 		{
-				addr_len = 0;
+				addr_len = sizeof(addr);
 				Com_memset(&addr, 0, sizeof(addr));
 				cli_fd = Com_accpet_timeout(__g_srv_sockfd, (struct sockaddr*)&addr, &addr_len, &timeout);
 
@@ -312,6 +312,11 @@ static bool_t mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu
 		
 
 		Com_ASSERT(mouse_stu != NULL);
+
+		if(msg_id == WM_MOUSEMOVE)
+		{
+				Com_printf(L"On MouseMove (%d:%d)\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
+		}
 		
 		is_ok = true;
 		x_full_screen = GetSystemMetrics(SM_CXSCREEN);
