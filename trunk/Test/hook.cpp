@@ -145,8 +145,6 @@ LRESULT CALLBACK mouse_proc(int code, WPARAM w, LPARAM l)
 						return 1;
 				}
 				
-				
-				
 				else
 				{
 						int relative_x_move = mouse_stu->pt.x - prev_x;
@@ -191,56 +189,131 @@ void hook_test1()
 }
 
 
-void hook_test2()
+
+
+
+
+
+
+/************************************************************************************************************************/
+
+LRESULT CALLBACK mouse_proc_display(int code, WPARAM w, LPARAM l)
 {
-		printf("\n别害怕15妙后你的鼠标就可以使用了^_^\n");
-		RECT rect;
-		rect.bottom = 1; rect.right = 1; rect.left = 0; rect.top = 0;
-		ClipCursor(&rect);
-		::Sleep(15000);
-		ClipCursor(NULL);
-}
 
-
-/*
-inline uint_64_t rdtsc()
-{
-		uint_64_t res;
-		__asm
-		{
-			pushad	;
-			CPUID	;
-			RDTSC	;
-			lea ebx, res;
-			mov	[ebx], eax;
-			mov	[ebx + 4], edx;
-			popad;
-		}
-		return res;
-}
-*/
-
-
-
-void hook_display_test()
-{
-		uint_64_t beg, end;
-
-		beg = __rdtsc();
-		int x = GetSystemMetrics(SM_CXSCREEN);
-		int y = GetSystemMetrics(SM_CYSCREEN);
-		end = __rdtsc();
-
-
-		printf("%d : %d : elapsed cycle == %I64d\r\n", x,y, end - beg);
+		int x_full_screen = GetSystemMetrics(SM_CXSCREEN);
+		int y_full_screen = GetSystemMetrics(SM_CYSCREEN);
+		MSLLHOOKSTRUCT *mouse_stu = (MSLLHOOKSTRUCT*)l;
 		
+		//::ShowCursor(FALSE);
+
+		if(code < 0)
+		{
+				return CallNextHookEx (g_kb_hook, code, w, l);
+		}
+
+		if(w == WM_MOUSEMOVE)
+		{
+				printf("Mouse Move (%d : %d)\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
+		}
+		return CallNextHookEx (g_kb_hook, code, w, l);
 }
+
+
+void hook_test_input_thread(void *data)
+{
+		cmEvent_t *ent = (cmEvent_t*)data;
+		assert(ent != NULL);
+
+		g_kb_hook = SetWindowsHookEx(WH_MOUSE_LL, (HOOKPROC)&mouse_proc_display,GetModuleHandle(NULL), 0);
+		
+		if (g_kb_hook == NULL)
+		{
+				fprintf (stderr, "SetWindowsHookEx failed with error %d\n", ::GetLastError ());
+				abort();
+		};
+		// 消息循环是必须的，想知道原因可以查msdn
+
+		Com_SetEvent(ent);
+
+		MSG msg;
+		while (GetMessage (&msg, NULL, 0, 0))
+		{
+				TranslateMessage (&msg);
+				DispatchMessage (&msg);
+		};
+		UnhookWindowsHookEx (g_kb_hook);
+}
+
+
+
+static void test_input()
+{
+
+		bool_t is_neg;
+		
+		is_neg = false;
+		while(true)
+		{
+#if(0)
+				INPUT ipt;
+				memset(&ipt, 0, sizeof(ipt));
+				
+				ipt.type = INPUT_MOUSE;
+				ipt.mi.dwFlags = MOUSEEVENTF_MOVE;
+				ipt.mi.dwExtraInfo = GetMessageExtraInfo();
+				ipt.mi.dx = is_neg ? -1 : 1;
+				ipt.mi.dy = 0;
+
+				for(int i = 0; i < 400; ++i)
+				{
+						SendInput(1, &ipt, sizeof(ipt));
+						::Sleep(10);
+				}
+#endif
+				for(int i = 0; i < 400; ++i)
+				{
+						mouse_event(MOUSEEVENTF_MOVE, is_neg ? -1 : 1, 0, 0, /*GetMessageExtraInfo()*/0);
+						::Sleep(10);
+				}
+
+				
+				::Sleep(10);
+				is_neg = !is_neg;
+		}
+
+}
+
+
+
+
+void hook_and_sendinput_test()
+{
+		cmEvent_t *event = Com_CreateEvent(false);
+
+		cmThread_t *thd = Com_CreateThread(hook_test_input_thread, (void*)event, NULL);
+		
+		Com_WaitEvent(event);
+
+		Com_DestroyEvent(event);
+		event = NULL;
+		
+		test_input();
+	
+		getchar();
+}
+
+
+
+
+
 
 void Hook_Test()
 {
+		
+		hook_and_sendinput_test();
 
 		//hook_display_test();
 
-		hook_test1();
+		//hook_test1();
 
 }
