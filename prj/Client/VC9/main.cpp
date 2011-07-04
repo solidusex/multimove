@@ -45,6 +45,12 @@ int main(int argc, char **argv)
 
 		Cli_Start();
 		
+		while(true)
+		{
+				Cli_InsertServer(NM_POS_RIGHT, L"192.168.1.124", 8412);
+				getchar();
+		}
+		
 		getchar();
 		Cli_Stop();
 
