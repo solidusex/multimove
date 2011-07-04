@@ -8,11 +8,6 @@ MM_NAMESPACE_BEGIN
 
 
 
-typedef enum
-{
-		SS_RECV_WAIT_HEADER,
-		SS_RECV_WAIT_PACKAGE
-}ssRecvState_t;
 
 
 typedef struct __session_tag
@@ -27,7 +22,7 @@ typedef struct __session_tag
 		
 		cmBuffer_t		*in_buf;
 		cmMutex_t		in_lock;
-		ssRecvState_t	recv_state;		/*CLI_RECV_WAIT_HEADER 情况下，remain_len初始值为2, CLI_RECV_WAIT_PACKAGE初始值为header所得到得包头*/		
+		nmRecvState_t	recv_state;		/*CLI_RECV_WAIT_HEADER 情况下，remain_len初始值为2, CLI_RECV_WAIT_PACKAGE初始值为header所得到得包头*/		
 		size_t			remain_len;
 		uint_64_t		last_recv_stamp;
 		

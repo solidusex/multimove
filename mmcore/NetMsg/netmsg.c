@@ -4,20 +4,6 @@ MM_NAMESPACE_BEGIN
 
 
 
-#if(0)
-typedef enum
-{
-		NM_MSG_HANDSHAKE = 0x00,		/*Client -> Server*/
-		NM_MSG_HANDSHAKE_REPLY,			/*Server -> Client*/
-
-		NM_MSG_ENTER,					/*Client -> Server*/
-		NM_MSG_LEAVE,					/*Server -> Client*/
-
-		NM_MSG_MOUSE,					/*Client -> Server*/
-		NM_MSG_KEYBOARD					/*Client -> Server*/
-}nmMsgType_t;
-#endif
-
 
 bool_t	keepalive_to_buffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 {
