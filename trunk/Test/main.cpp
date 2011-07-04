@@ -47,8 +47,8 @@ int main(int argc, char **argv)
 		Com_Init(&cm_init);
 		
 		//Common_Test();
-		//Hook_Test();
-		NetMsg_Test();
+		Hook_Test();
+		//NetMsg_Test();
 		//Client_Test();
 		//Server_Test();
 

@@ -431,11 +431,19 @@
 			Name="Server"
 			>
 			<File
-				RelativePath="..\..\..\mmcore\Server\Server.c"
+				RelativePath="..\..\..\mmcore\Server\server.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\mmcore\Server\Server.h"
+				RelativePath="..\..\..\mmcore\Server\server.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\session.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\session.h"
 				>
 			</File>
 			<File
