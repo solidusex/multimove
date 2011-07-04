@@ -131,14 +131,14 @@ static void	hook_thread_func(void *data)
 		Com_ASSERT(completion_event != NULL);
 		Com_ASSERT(__g_hook_thread_id == GetCurrentThreadId());
 
-		/*
+		
 		__g_keyboard_hook = SetWindowsHookEx (WH_KEYBOARD_LL, (HOOKPROC)&keyboard_hook_func, GetModuleHandle(NULL), 0);
 		
 		if(__g_keyboard_hook == NULL)
 		{
 				Com_error(COM_ERR_FATAL, L"Hook keyboard failed : error code (%d)\r\n", GetLastError());
 		}
-		*/
+		
 
 		__g_mouse_hook = SetWindowsHookEx(WH_MOUSE_LL, (HOOKPROC)&mouse_hook_func,GetModuleHandle(NULL), 0);
 
@@ -181,7 +181,7 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 		
 		mouse_stu = (MSLLHOOKSTRUCT*)l;
 
-		Com_printf(L"On on_normal_mouse_action\r\n");
+		//Com_printf(L"On on_normal_mouse_action\r\n");
 		Com_ASSERT(mouse_stu != NULL);
 		
 		switch(w)
@@ -417,7 +417,8 @@ static LRESULT CALLBACK mouse_hook_func(int code, WPARAM w, LPARAM l)
 static LRESULT CALLBACK keyboard_hook_func(int code, WPARAM w, LPARAM l)
 {
 		hkCliState_t s;
-
+		
+		const KBDLLHOOKSTRUCT *kb_stu;
 		if(code != HC_ACTION)
 		{
 				return CallNextHookEx(__g_keyboard_hook, code, w, l);
@@ -427,9 +428,8 @@ static LRESULT CALLBACK keyboard_hook_func(int code, WPARAM w, LPARAM l)
 		s = __g_state;
 		Com_UnLockMutex(&__g_lock);
 		
+		kb_stu = (const KBDLLHOOKSTRUCT*)l;
 
-
-		
 		
 		switch(s)
 		{
@@ -440,8 +440,52 @@ static LRESULT CALLBACK keyboard_hook_func(int code, WPARAM w, LPARAM l)
 				break;
 		case HK_STATE_REMOTE:
 		{
-				/*return CallNextHookEx(__g_keyboard_hook, code, w, l);*/
+				bool_t	is_key_down = true;
+				bool_t	need_send_msg = true;
+				BYTE vk,scan;
+				switch(w)
+				{
+				case WM_KEYDOWN:
+				case WM_SYSKEYDOWN:
+						is_key_down = true;
+						need_send_msg = true;
+						vk = kb_stu->vkCode;
+						scan = kb_stu->scanCode;
+						break;
+				case WM_KEYUP:
+				case WM_SYSKEYUP:
+						is_key_down = false;
+						need_send_msg = true;
+						vk = kb_stu->vkCode;
+						scan = kb_stu->scanCode;
+						break;
+				default:
+						is_key_down = false;
+						need_send_msg = false;
+						vk = 0;
+						scan = 0;
+						break;
+				}
+				
+				if(need_send_msg)
+				{
+						Com_LockMutex(&__g_lock);
 
+						if(__g_entry[__g_curr_pos].handler != NULL)
+						{
+								nmMsg_t	msg;
+								msg.t = NM_MSG_KEYBOARD;
+								msg.keyboard.is_keydown = is_key_down;
+								msg.keyboard.vk = vk;
+								msg.keyboard.scan = scan;
+								__g_entry[__g_curr_pos].handler(&msg, __g_entry[__g_curr_pos].ctx);
+						}
+
+						Com_UnLockMutex(&__g_lock);
+
+				}
+
+				//return need_call_next ? CallNextHookEx(__g_keyboard_hook, code, w, l) : 1;
 				return 1;
 		}
 				break;

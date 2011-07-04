@@ -293,7 +293,7 @@ static void	client_io_thread_func(void *data)
 								
 								if(!SS_OnTimer(ss))
 								{
-										//Com_printf("Timeout Cli_RemoveServer Cli_OnTimer \r\n");
+										Com_printf(L"Timeout Cli_RemoveServer Cli_OnTimer \r\n");
 										Cli_RemoveServer(ss->for_position);
 								}
 						}
@@ -319,6 +319,7 @@ static void	client_io_thread_func(void *data)
 										{
 												if(!SS_SendData(ss))
 												{
+														Com_printf(L"Send failed on session %s:%d\r\n", ss->ip, ss->port);
 														Cli_RemoveServer(ss->for_position);
 												}
 										}
@@ -335,6 +336,7 @@ static void	client_io_thread_func(void *data)
 										{
 												if(!SS_RecvData(ss))
 												{
+														Com_printf(L"Recv failed on session %s:%d\r\n", ss->ip, ss->port);
 														Cli_RemoveServer(ss->for_position);
 												}
 										}
