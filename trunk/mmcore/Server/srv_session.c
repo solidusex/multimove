@@ -319,7 +319,13 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						goto END_POINT;
 				}
 				
-				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 100, (DWORD)(msg.enter.y * 65535 / msg.enter.src_y_fullscreen), 0, 0);
+				if(ss->pos == NM_POS_RIGHT)
+				{
+						mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 10 * 65535 / msg.enter.src_x_fullscreen, (DWORD)(msg.enter.y * 65535 / msg.enter.src_y_fullscreen), 0, 0);
+				}else if(ss->pos == NM_POS_LEFT)
+				{
+						mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, (msg.enter.src_x_fullscreen - 10) * 65535 / msg.enter.src_x_fullscreen, (DWORD)(msg.enter.y * 65535 / msg.enter.src_y_fullscreen), 0, 0);
+				}
 				ss->is_entered = true;
 		}
 				break;
