@@ -67,9 +67,9 @@ static BOOL __show_cursor()
 
 /*****************************************************************************************************************/
 
-ss_t*		SS_ConnectSession(nmPosition_t	pos, const wchar_t			*ip, uint_16_t		port)
+cliSession_t*		SS_ConnectSession(nmPosition_t	pos, const wchar_t			*ip, uint_16_t		port)
 {
-		ss_t *ss = NULL;
+		cliSession_t *ss = NULL;
 		SOCKET fd = INVALID_SOCKET;
 		struct sockaddr_in		addr;
 		const uint_64_t timeout = SS_CONNECT_TO_SRV_TIMEOUT;
@@ -118,7 +118,7 @@ ss_t*		SS_ConnectSession(nmPosition_t	pos, const wchar_t			*ip, uint_16_t		port)
 				return NULL;
 		}
 
-		ss = Com_NEW0(ss_t);
+		ss = Com_NEW0(cliSession_t);
 		ss->ip = Com_wcsdup(ip);
 		ss->port = port;
 		ss->for_position = pos;
@@ -143,7 +143,7 @@ ss_t*		SS_ConnectSession(nmPosition_t	pos, const wchar_t			*ip, uint_16_t		port)
 
 
 
-void			SS_CloseSession(ss_t *ss)
+void			SS_CloseSession(cliSession_t *ss)
 {
 		Com_ASSERT(ss != NULL);
 		
@@ -164,20 +164,20 @@ void			SS_CloseSession(ss_t *ss)
 
 
 
-bool_t		SS_IsActive(const ss_t *ss)
+bool_t		SS_IsActive(const cliSession_t *ss)
 {
 		Com_ASSERT(ss != NULL);
 		return ss->is_active;
 
 }
 
-bool_t		SS_IsHandshaked(const ss_t *ss)
+bool_t		SS_IsHandshaked(const cliSession_t *ss)
 {
 		Com_ASSERT(ss != NULL);
 		return ss->is_handshaked;
 }
 
-bool_t		SS_HasDataToSend(ss_t *ss)		/*out_bufÊÇ·ñ´æÔÚÊý¾Ý*/
+bool_t		SS_HasDataToSend(cliSession_t *ss)		/*out_bufÊÇ·ñ´æÔÚÊý¾Ý*/
 {
 		bool_t has_data_to_send;
 		Com_ASSERT(ss != NULL);
@@ -189,7 +189,7 @@ bool_t		SS_HasDataToSend(ss_t *ss)		/*out_bufÊÇ·ñ´æÔÚÊý¾Ý*/
 }
 
 
-bool_t		SS_SendData(ss_t *ss)		/*½«out_bufÊý¾ÝÓÃ·Ç×èÈû·½Ê½·¢ËÍ³öÈ¥*/
+bool_t		SS_SendData(cliSession_t *ss)		/*½«out_bufÊý¾ÝÓÃ·Ç×èÈû·½Ê½·¢ËÍ³öÈ¥*/
 {
 		bool_t	is_ok;
 		const byte_t *p;
@@ -234,7 +234,7 @@ END_POINT:
 
 
 
-bool_t		SS_RecvData(ss_t *ss)		/*´ÓsockfdÒÔ·Ç×èÈû·½Ê½½ÓÊÕ¶Ô¶ËÊý¾Ý£¬·ÅÈëin_bufÊý¾Ý,²¢½øÐÐºóÐø´¦Àí*/
+bool_t		SS_RecvData(cliSession_t *ss)		/*´ÓsockfdÒÔ·Ç×èÈû·½Ê½½ÓÊÕ¶Ô¶ËÊý¾Ý£¬·ÅÈëin_bufÊý¾Ý,²¢½øÐÐºóÐø´¦Àí*/
 {
 		int rn;
 		u_long available;
@@ -336,7 +336,7 @@ END_POINT:
 
 
 
-bool_t		SS_OnTimer(ss_t *ss) /*·µ»ØÕæÎªÐèÒª¼ÌÐø´¦Àí£¬·µ»ØfalseÔò´Ó__g_srv_setÉ¾³ýµô*/
+bool_t		SS_OnTimer(cliSession_t *ss) /*·µ»ØÕæÎªÐèÒª¼ÌÐø´¦Àí£¬·µ»ØfalseÔò´Ó__g_srv_setÉ¾³ýµô*/
 {
 		Com_ASSERT(ss != NULL);
 
@@ -356,7 +356,7 @@ bool_t		SS_OnTimer(ss_t *ss) /*·µ»ØÕæÎªÐèÒª¼ÌÐø´¦Àí£¬·µ»ØfalseÔò´Ó__g_srv_setÉ¾³
 		return true;
 }
 
-bool_t		SS_SendKeepAlive(ss_t *ss)
+bool_t		SS_SendKeepAlive(cliSession_t *ss)
 {
 		nmMsg_t msg;
 		Com_ASSERT(ss != NULL);
@@ -373,7 +373,7 @@ bool_t		SS_SendKeepAlive(ss_t *ss)
 }
 
 
-bool_t		SS_SendHandShake(ss_t *ss)
+bool_t		SS_SendHandShake(cliSession_t *ss)
 {
 		nmMsg_t msg;
 		Com_ASSERT(ss != NULL);
@@ -391,7 +391,7 @@ bool_t		SS_SendHandShake(ss_t *ss)
 }
 
 
-bool_t		SS_SendEnterMsg(ss_t *ss, const nmMsg_t *msg)
+bool_t		SS_SendEnterMsg(cliSession_t *ss, const nmMsg_t *msg)
 {
 		Com_ASSERT(ss != NULL && msg && msg->t == NM_MSG_ENTER);
 		Com_LockMutex(&ss->out_lock);
@@ -405,7 +405,7 @@ bool_t		SS_SendEnterMsg(ss_t *ss, const nmMsg_t *msg)
 		return true;
 }
 
-bool_t		SS_SendMouseMsg(ss_t *ss, const nmMsg_t *msg)
+bool_t		SS_SendMouseMsg(cliSession_t *ss, const nmMsg_t *msg)
 {
 		Com_ASSERT(ss != NULL && msg && msg->t == NM_MSG_MOUSE);
 		Com_LockMutex(&ss->out_lock);
@@ -417,7 +417,7 @@ bool_t		SS_SendMouseMsg(ss_t *ss, const nmMsg_t *msg)
 }
 
 
-bool_t		SS_SendKeyboardMsg(ss_t *ss, const nmMsg_t *msg)
+bool_t		SS_SendKeyboardMsg(cliSession_t *ss, const nmMsg_t *msg)
 {
 
 		Com_ASSERT(ss != NULL && msg && msg->t == NM_MSG_KEYBOARD);
@@ -432,7 +432,7 @@ bool_t		SS_SendKeyboardMsg(ss_t *ss, const nmMsg_t *msg)
 
 
 
-bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
+bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 {
 		bool_t is_ok;
 		nmMsg_t msg;
