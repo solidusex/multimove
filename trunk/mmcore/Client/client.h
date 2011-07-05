@@ -22,10 +22,8 @@ bool_t	Cli_Stop();
 
 
 
-
 bool_t	Cli_InsertServer(nmPosition_t pos, const wchar_t *srv_ip, uint_16_t port);
 bool_t	Cli_RemoveServer(nmPosition_t pos);
-
 
 
 

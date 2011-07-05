@@ -18,7 +18,7 @@ typedef enum
 }nmPosition_t;
 
 
-#define NM_KEEPALIVE_TIMEOUT			10 * 1000		/*1000秒钟没有任何socket上的IO操作则认为该客户端已不存在*/
+#define NM_KEEPALIVE_TIMEOUT			10 * 1000		/*10秒钟没有任何socket上的IO操作则认为该客户端已不存在*/
 #define NM_TIMER_TICK					1  * 1000		/*2秒检查一次*/
 
 
@@ -39,7 +39,8 @@ typedef enum
 		NM_MSG_LEAVE,					/*Server -> Client*/
 
 		NM_MSG_MOUSE,					/*Client -> Server*/
-		NM_MSG_KEYBOARD					/*Client -> Server*/
+		NM_MSG_KEYBOARD, 				/*Client -> Server*/
+		NM_MSG_CLIPDATA					/*Client -> Server && Server -> Client */
 }nmMsgType_t;
 
 
@@ -86,6 +87,20 @@ typedef struct __keyboard_msg_tag
 
 
 
+
+typedef enum
+{
+		NM_CLIP_TEXT	/*UTF8编码文本*/
+}nmClipDataType_t;
+
+typedef struct __clipboard_data_tag
+{
+		nmClipDataType_t		data_type;
+		const byte_t			*data;
+		size_t					length;
+}nmClipboardData_t;
+
+
 typedef struct __netmsg_tag
 {
 		nmMsgType_t		t;
@@ -95,6 +110,7 @@ typedef struct __netmsg_tag
 				nmLeaveMsg_t			leave;
 				nmMouseMsg_t			mouse;
 				nmKeyboardMsg_t			keyboard;
+				nmClipboardData_t		clip_data;
 		};
 }nmMsg_t;
 

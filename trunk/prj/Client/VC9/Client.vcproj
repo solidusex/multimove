@@ -447,6 +447,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\mmcore\Client\cli_wndsrv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Client\cli_wndsrv.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\mmcore\Client\client.c"
 				>
 			</File>

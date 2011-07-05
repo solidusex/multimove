@@ -182,6 +182,31 @@ static bool_t	keybd_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 }
 
 
+static bool_t	clipdata_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
+{
+
+		uint_16_t		package_len;
+		uint_8_t		package_type;
+		
+		uint_8_t		clipdata_type;
+		Com_ASSERT(msg && msg->t == NM_MSG_CLIPDATA && out != NULL);
+		Com_ASSERT(msg->clip_data.data != NULL && msg->clip_data.length > 0);
+
+		package_len = COM_LTON_U16(sizeof(package_type) + sizeof(clipdata_type) + msg->clip_data.length);
+		package_type = NM_MSG_CLIPDATA;
+		clipdata_type = msg->clip_data.data_type;
+		
+		
+		Com_InsertBuffer(out, (const byte_t*)&package_len, sizeof(package_len));
+		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
+
+		Com_InsertBuffer(out, (const byte_t*)&clipdata_type, sizeof(clipdata_type));
+		Com_InsertBuffer(out, (const byte_t*)&msg->clip_data.data, msg->clip_data.length);
+		return true;
+}
+
+
+
 bool_t	NM_MsgToBuffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 {
 		Com_ASSERT(msg != NULL && out != NULL);
@@ -208,6 +233,8 @@ bool_t	NM_MsgToBuffer(const nmMsg_t	*msg, cmBuffer_t		*out)
 		case NM_MSG_KEYBOARD:
 				return keybd_to_buffer(msg, out);
 				break;
+		case NM_MSG_CLIPDATA:
+				return clipdata_to_buffer(msg, out);
 		default:
 				Com_error(COM_ERR_FATAL, L"Invalid msg type : %d\r\n", msg->t);
 				return false; /*disable warning*/
@@ -427,6 +454,43 @@ static bool_t parse_keybd(const byte_t *data, size_t len, nmMsg_t	*msg)
 }
 
 
+static bool_t parse_clipdata(const byte_t *data, size_t len, nmMsg_t	*msg)
+{
+		uint_8_t clip_data_type;
+		const byte_t *content;
+		size_t length;
+		Com_ASSERT(data != NULL &&  msg != NULL);
+		
+		if(len < 2) /*至少有一个类型和一个数据*/
+		{
+				return false;
+		}
+
+		clip_data_type = (uint_8_t)*data;
+		data++;
+		len--;
+		switch(clip_data_type)
+		{
+		case NM_CLIP_TEXT:
+				break;
+		default:
+				return false;
+				break;
+		}
+
+		content = data;
+		length = len;
+
+		Com_memset(msg, 0, sizeof(*msg));
+		
+		msg->t = NM_MSG_CLIPDATA;
+		msg->clip_data.data_type = (nmClipDataType_t)clip_data_type;
+		msg->clip_data.data = content;
+		msg->clip_data.length = length;
+		
+		return true;
+
+}
 
 
 bool_t	NM_ParseFromBuffer(const byte_t *data, size_t len, nmMsg_t	*msg)
@@ -469,6 +533,8 @@ bool_t	NM_ParseFromBuffer(const byte_t *data, size_t len, nmMsg_t	*msg)
 		case NM_MSG_KEYBOARD:
 				return parse_keybd(p, len - 1, msg);
 				break;
+		case NM_MSG_CLIPDATA:
+				return parse_clipdata(p, len - 1, msg);
 		default:
 				Com_error(COM_ERR_WARNING, L"Receive invalid msg type : %d\r\n", package_type);
 				return false; /*disable warning*/

@@ -37,27 +37,28 @@ typedef struct __session_tag
 
 #define		SS_CONNECT_TO_SRV_TIMEOUT		3 * 1000	/*连接多少毫秒后提示超时失败*/
 
-cliSession_t*		SS_ConnectSession(nmPosition_t	dir, const wchar_t			*ip, uint_16_t		port); /*会阻塞至多SS_CONNECT_TO_SRV_TIMEOUT秒钟*/
-void		SS_CloseSession(cliSession_t *ss);
-bool_t		SS_IsActive(const cliSession_t *ss);
-bool_t		SS_IsHandshaked(const cliSession_t *ss);
+cliSession_t*	SS_ConnectSession(nmPosition_t	dir, const wchar_t			*ip, uint_16_t		port); /*会阻塞至多SS_CONNECT_TO_SRV_TIMEOUT秒钟*/
+void			SS_CloseSession(cliSession_t *ss);
+bool_t			SS_IsActive(const cliSession_t *ss);
+bool_t			SS_IsHandshaked(const cliSession_t *ss);
 
-bool_t		SS_HasDataToSend(cliSession_t *ss);		/*out_buf是否存在数据*/
-bool_t		SS_RecvData(cliSession_t *ss);		/*从sockfd以非阻塞方式接收对端数据，放入in_buf数据,并进行后续处理*/
-bool_t		SS_SendData(cliSession_t *ss);		/*将out_buf数据用非阻塞方式发送出去*/
-bool_t		SS_OnTimer(cliSession_t *ss); /*返回真为需要继续处理，返回false则从__g_srv_set删除掉*/
+bool_t			SS_HasDataToSend(cliSession_t *ss);		/*out_buf是否存在数据*/
+bool_t			SS_RecvData(cliSession_t *ss);		/*从sockfd以非阻塞方式接收对端数据，放入in_buf数据,并进行后续处理*/
+bool_t			SS_SendData(cliSession_t *ss);		/*将out_buf数据用非阻塞方式发送出去*/
+bool_t			SS_OnTimer(cliSession_t *ss); /*返回真为需要继续处理，返回false则从__g_srv_set删除掉*/
 
 
 
 /*发送*/
-bool_t		SS_SendKeepAlive(cliSession_t *ss);
-bool_t		SS_SendHandShake(cliSession_t *ss);
-bool_t		SS_SendEnterMsg(cliSession_t *ss, const nmMsg_t *msg);
-bool_t		SS_SendMouseMsg(cliSession_t *ss, const nmMsg_t *msg);
-bool_t		SS_SendKeyboardMsg(cliSession_t *ss, const nmMsg_t *msg);
+bool_t			SS_SendKeepAlive(cliSession_t *ss);
+bool_t			SS_SendHandShake(cliSession_t *ss);
+bool_t			SS_SendEnterMsg(cliSession_t *ss, const nmMsg_t *msg);
+bool_t			SS_SendMouseMsg(cliSession_t *ss, const nmMsg_t *msg);
+bool_t			SS_SendKeyboardMsg(cliSession_t *ss, const nmMsg_t *msg);
+bool_t			SS_SendClipDataMsg(cliSession_t *ss, const nmMsg_t *msg);
 
 /*接收*/
-bool_t		SS_HandleRecvBuffer(cliSession_t *s, const byte_t *data, size_t length);
+bool_t			SS_HandleRecvBuffer(cliSession_t *s, const byte_t *data, size_t length);
 
 
 

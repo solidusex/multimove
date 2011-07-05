@@ -436,6 +436,72 @@ bool_t		SS_SendKeyboardMsg(cliSession_t *ss, const nmMsg_t *msg)
 }
 
 
+bool_t			SS_SendClipDataMsg(cliSession_t *ss, const nmMsg_t *msg)
+{
+		Com_ASSERT(ss != NULL && msg && msg->t == NM_MSG_CLIPDATA);
+
+		
+		Com_LockMutex(&ss->out_lock);
+		
+		NM_MsgToBuffer(msg, ss->out_buf);
+
+		Com_UnLockMutex(&ss->out_lock);
+
+		return true;
+
+}
+
+
+static bool_t	__set_clipboard_data(const nmMsg_t *msg)
+{
+		wchar_t *utf16;
+		size_t l;
+		HGLOBAL hglb;
+		if(!OpenClipboard(NULL))
+		{
+				Com_error(COM_ERR_WARNING, L"OpenClipboard failed\r\n");
+				return false;
+		}
+
+		if(!EmptyClipboard())
+		{
+				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed\r\n");
+				return false;
+		}
+
+
+		utf16 = Com_str_convto_wcs(COM_CP_UTF8, (const char*)msg->clip_data.data, msg->clip_data.length);
+		if(utf16 == NULL)
+		{
+				Com_error(COM_ERR_WARNING, L"Invlaid clipboard data\r\n");
+				return false;
+		}
+		
+		l = Com_wcslen(utf16);
+
+		if(l == 0)
+		{
+				Com_DEL(utf16);
+				return true;
+		}
+
+		hglb = GlobalAlloc(GMEM_DDESHARE, (l +1) * sizeof(wchar_t));
+		if (hglb != NULL) 
+		{
+				wchar_t *dest = (wchar_t*) GlobalLock(hglb);
+				Com_wcscpy(dest, utf16);
+				GlobalUnlock(hglb);
+				SetClipboardData(CF_UNICODETEXT, hglb);
+		}
+
+		if(utf16)
+		{
+				Com_DEL(utf16);
+				utf16 = NULL;
+		}
+
+		return CloseClipboard() ? true : false;
+}
 
 bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 {
@@ -512,6 +578,9 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 				Hook_Cli_ControlReturn();
 
 		}
+				break;
+		case NM_MSG_CLIPDATA:
+				__set_clipboard_data(&msg);
 				break;
 		case NM_MSG_MOUSE:
 		case NM_MSG_KEYBOARD:
