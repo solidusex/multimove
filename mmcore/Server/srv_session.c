@@ -334,19 +334,24 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 				case NM_POS_LEFT:/*如果我在左面，则指针从右面出来*/
 						x_pos = (src_x_fullscreen - 10) * 65535 / src_x_fullscreen;
 						y_pos = msg.enter.y * 65535 / msg.enter.src_y_fullscreen;
+						break;
 				case NM_POS_RIGHT:/*如果我在右面，则指针从左面出来*/
 						x_pos = 10 * 65535 / src_x_fullscreen;
 						y_pos = msg.enter.y * 65535 / msg.enter.src_y_fullscreen;
+						break;
 				case NM_POS_UP:
 						x_pos = msg.enter.x * 65535 / msg.enter.src_x_fullscreen;
 						y_pos = (src_y_fullscreen - 10) * 65535 / src_y_fullscreen;
+						break;
 				case NM_POS_DOWN:
 						x_pos = msg.enter.x * 65535 / msg.enter.src_x_fullscreen;
 						y_pos = 10 * 65535 / src_y_fullscreen;
+						break;
 				default:
 						x_pos = 0;
 						y_pos = 0;
 						Com_ASSERT(false);
+						break;
 				}
 				
 				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, x_pos, y_pos, 0, 0);
@@ -394,17 +399,19 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 								need_send_leave = true;
 						}
 
-						if(ss->pos == NM_POS_UP && pt.y <= 0 && msg.mouse.y < 0)
+						if(ss->pos == NM_POS_UP && pt.y >= src_y_fullscreen - 1 && msg.mouse.y > 0)
 						{
 								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
 								need_send_leave = true;
 						}
 
-						if(ss->pos == NM_POS_DOWN && pt.y >= src_y_fullscreen - 1 && msg.mouse.y > 0)
+						if(ss->pos == NM_POS_DOWN && pt.y <= 0 && msg.mouse.y < 0)
 						{
 								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
 								need_send_leave = true;
 						}
+
+						
 
 						if(need_send_leave)
 						{
