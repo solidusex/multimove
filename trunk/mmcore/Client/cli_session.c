@@ -1,3 +1,4 @@
+#define OEMRESOURCE 1
 
 #include "cli_hook.h"
 #include "cli_session.h"
@@ -5,10 +6,64 @@
 MM_NAMESPACE_BEGIN
 
 
+static const UINT __g_cursor_id[] = 
+{
+		OCR_APPSTARTING,
+		OCR_NORMAL,
+		OCR_CROSS,
+		OCR_HAND,
+		OCR_IBEAM,
+		OCR_NO,
+		OCR_SIZEALL,
+		OCR_SIZENESW,
+		OCR_SIZENS,
+		OCR_SIZENWSE,
+		OCR_SIZEWE,
+		OCR_UP,
+		OCR_WAIT,
+};
 
 
 
+static BOOL __hide_cursor()
+{
+		
 
+		wchar_t buf[MAX_PATH * 2];
+		wchar_t d[5], dir[MAX_PATH];
+		HCURSOR new_cursor;
+
+		if(!GetModuleFileNameW(GetModuleHandle(NULL), buf, MAX_PATH * 2))
+		{
+				return FALSE;
+		}
+
+		
+		_wsplitpath(buf, d, dir, NULL, NULL);
+
+		_snwprintf(buf, MAX_PATH * 2, L"%s%s%s", d, dir, L"blank_cursor.cur");
+
+		new_cursor = LoadCursorFromFile(buf);
+
+		if(new_cursor == NULL)
+		{
+				Com_error(COM_ERR_WARNING, L"Can not load blank cursor\r\n");
+				return FALSE;
+		}
+
+		for(int i = 0; i < sizeof(__g_cursor_id)/sizeof(__g_cursor_id[0]); ++i)
+		{
+				SetSystemCursor(CopyCursor(new_cursor), __g_cursor_id[i]);
+		}
+		
+		return TRUE;
+
+}
+
+static BOOL __show_cursor()
+{
+		return SystemParametersInfo(SPI_SETCURSORS,0,0,WM_SETTINGCHANGE | SPIF_UPDATEINIFILE );
+}
 
 /*****************************************************************************************************************/
 
@@ -344,6 +399,9 @@ bool_t		SS_SendEnterMsg(ss_t *ss, const nmMsg_t *msg)
 		NM_MsgToBuffer(msg, ss->out_buf);
 
 		Com_UnLockMutex(&ss->out_lock);
+
+		__hide_cursor();
+
 		return true;
 }
 
@@ -400,6 +458,7 @@ bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
 				break;
 		case NM_MSG_LEAVE:
 		{
+				__show_cursor();
 				int x_full_screen, y_full_screen;
 				DWORD mouse_pos_x, mouse_pos_y;
 				x_full_screen = GetSystemMetrics(SM_CXSCREEN);
