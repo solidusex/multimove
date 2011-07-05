@@ -18,7 +18,7 @@ typedef enum
 }nmPosition_t;
 
 
-#define NM_KEEPALIVE_TIMEOUT			100 * 1000		/*1000秒钟没有任何socket上的IO操作则认为该客户端已不存在*/
+#define NM_KEEPALIVE_TIMEOUT			10 * 1000		/*1000秒钟没有任何socket上的IO操作则认为该客户端已不存在*/
 #define NM_TIMER_TICK					1  * 1000		/*2秒检查一次*/
 
 
