@@ -39,6 +39,8 @@ void			SS_CloseClientSession(srvSession_t *ss);
 bool_t			SS_SendKeepAlive(srvSession_t *ss);
 bool_t			SS_SendHandShakeReply(srvSession_t *ss);
 bool_t			SS_SendMouseLeave(srvSession_t *ss, const nmMsg_t *msg);
+bool_t			SS_SendClipDataMsg(srvSession_t *ss, const nmMsg_t *msg);
+
 bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len);
 
 bool_t			SS_HasDataToSend(srvSession_t *ss);		/*out_buf是否存在数据*/

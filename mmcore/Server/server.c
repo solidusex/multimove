@@ -1,5 +1,5 @@
 
-//#include "srv_hook.h"
+#include "srv_wndsrv.h"
 #include "server.h"
 #include "srv_session.h"
 
@@ -27,6 +27,7 @@ bool_t Srv_UnInit()
 /*****************************************************************************************************************/
 
 
+static bool_t	__on_window_notify(const nmMsg_t *msg);
 
 
 
@@ -86,16 +87,15 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 		Com_InitMutex(&__g_ss_lock);
 		__g_ss = NULL;
 
-		/*
 		
-		if(!Hook_Srv_Start(mouse_event_handler))
+		if(!WND_Srv_Start(__on_window_notify))
 		{
 				Com_UnInitMutex(&__g_ss_lock);
 				closesocket(fd);
 				fd = INVALID_SOCKET;
 				return false;
 		}
-		*/
+		
 		
 		__g_srv_sockfd = fd;
 		__g_is_started = true;
@@ -114,9 +114,9 @@ bool_t	Srv_Stop()
 				return false;
 		}
 
-		/*
-		Hook_Srv_Stop();
-		*/
+		
+		WND_Srv_Stop();
+		
 
 		__g_is_started = false;
 		Com_JoinThread(__g_working_thread);
@@ -138,6 +138,8 @@ bool_t	Srv_IsStarted()
 {
 		return __g_is_started;
 }
+
+
 
 
 
@@ -306,6 +308,34 @@ HANDLE_END_POINT:
 }
 
 
+bool_t	__on_window_notify(const nmMsg_t *msg)
+{
+		bool_t ret;
+		Com_ASSERT(msg != NULL);
+		
+		ret = true;
+
+		Com_LockMutex(&__g_ss_lock);
+		if(__g_ss != NULL)
+		{
+				switch(msg->t)
+				{
+				case NM_MSG_CLIPDATA:
+						ret = SS_SendClipDataMsg(__g_ss, msg);
+						break;
+				default:
+						Com_ASSERT(false);
+						ret = false;
+						break;
+				}
+		}
+		
+		Com_UnLockMutex(&__g_ss_lock);
+
+		return ret;
+
+
+}
 
 
 

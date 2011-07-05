@@ -121,6 +121,21 @@ bool_t			SS_SendMouseLeave(srvSession_t *ss, const nmMsg_t *msg)
 }
 
 
+bool_t			SS_SendClipDataMsg(srvSession_t *ss, const nmMsg_t *msg)
+{
+		Com_ASSERT(ss != NULL && msg && msg->t == NM_MSG_CLIPDATA);
+
+		
+		Com_LockMutex(&ss->out_lock);
+		
+		NM_MsgToBuffer(msg, ss->out_buf);
+
+		Com_UnLockMutex(&ss->out_lock);
+
+		return true;
+}
+
+
 bool_t			SS_HasDataToSend(srvSession_t *ss)
 {
 		bool_t	has_data;
