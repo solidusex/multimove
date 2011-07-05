@@ -412,7 +412,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						break;
 				case WM_MOUSEWHEEL:
 				{
-						mouse_event(MOUSEEVENTF_WHEEL, 0,0, (DWORD)data, 0);
+						mouse_event(MOUSEEVENTF_WHEEL, 0,0, (DWORD)msg.mouse.data, 0);
 				}
 						break;
 				case WM_MOUSEHWHEEL:
