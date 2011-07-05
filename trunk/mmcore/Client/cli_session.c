@@ -294,7 +294,7 @@ RECHECK_POINT:
 								Com_EraseBuffer(ss->in_buf, sizeof(package_len));
 								package_len = COM_NTOL_U16(package_len);
 
-								if(package_len > 1 * COM_KB || package_len < 1)/*包过大或过小*/
+								if(package_len > 10 * COM_MB || package_len < 1)/*包过大或过小*/
 								{
 										is_ok = false;
 										goto END_POINT;

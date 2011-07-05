@@ -446,6 +446,14 @@
 				RelativePath="..\..\..\mmcore\Server\srv_session.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\srv_wndsrv.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Server\srv_wndsrv.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="NetMsg"

@@ -201,7 +201,7 @@ static bool_t	clipdata_to_buffer(const nmMsg_t *msg, cmBuffer_t *out)
 		Com_InsertBuffer(out, (const byte_t*)&package_type, sizeof(package_type));
 
 		Com_InsertBuffer(out, (const byte_t*)&clipdata_type, sizeof(clipdata_type));
-		Com_InsertBuffer(out, (const byte_t*)&msg->clip_data.data, msg->clip_data.length);
+		Com_InsertBuffer(out, (const byte_t*)msg->clip_data.data, msg->clip_data.length);
 		return true;
 }
 
