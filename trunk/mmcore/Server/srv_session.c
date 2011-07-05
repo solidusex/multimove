@@ -72,9 +72,20 @@ bool_t			SS_IsEntered(const srvSession_t *ss)
 		return ss->is_entered;
 }
 
+
 bool_t			SS_SendKeepAlive(srvSession_t *ss)
 {
+		nmMsg_t msg;
 		Com_ASSERT(ss != NULL);
+
+		Com_memset(&msg, 0, sizeof(msg));
+		msg.t = NM_MSG_KEEPALIVE;
+
+		Com_LockMutex(&ss->out_lock);
+		
+		NM_MsgToBuffer(&msg, ss->out_buf);
+
+		Com_UnLockMutex(&ss->out_lock);
 		return true;
 }
 
@@ -283,6 +294,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 		switch(msg.t)
 		{
 		case NM_MSG_KEEPALIVE:
+				Com_printf(L"Session from (%s:%d) received NM_MSG_KEEPALIVE\r\n", ss->ip, ss->port);
 				is_ok = true;
 				break;
 		case NM_MSG_HANDSHAKE:

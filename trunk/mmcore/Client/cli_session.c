@@ -380,6 +380,7 @@ bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
 		switch(msg.t)
 		{
 		case NM_MSG_KEEPALIVE:
+				Com_printf(L"Session (%s:%d) received NM_MSG_KEEPALIVE\r\n", ss->ip, ss->port);
 				is_ok = true;
 				break;
 		case NM_MSG_HANDSHAKE_REPLY:
