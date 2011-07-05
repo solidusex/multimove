@@ -419,6 +419,7 @@ static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx)
 		case NM_MSG_KEYBOARD:
 				return SS_SendKeyboardMsg(ss, msg);
 		case NM_MSG_CLIPDATA:
+				Com_printf(L"Send NM_MSG_CLIPDATA\r\n");
 				return SS_SendClipDataMsg(ss, msg);
 		}
 
