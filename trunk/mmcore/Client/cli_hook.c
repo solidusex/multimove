@@ -347,6 +347,8 @@ static LRESULT on_remote_mouse_action(int code, WPARAM w, LPARAM l)
 		
 		int		relative_x, relative_y;
 		bool_t need_send_msg, need_call_next;
+		short mouse_data = 0;
+
 		//Com_printf(L"On on_remote_mouse_action\r\n");
 		x_full_screen = GetSystemMetrics(SM_CXSCREEN);
 		y_full_screen = GetSystemMetrics(SM_CYSCREEN);
@@ -419,6 +421,7 @@ static LRESULT on_remote_mouse_action(int code, WPARAM w, LPARAM l)
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
 		case WM_MOUSEWHEEL:
+				mouse_data = (short)((mouse_stu->mouseData >> 16) & 0xffff);
 		case WM_MOUSEHWHEEL:
 		case WM_RBUTTONDOWN:
 		case WM_RBUTTONUP:
@@ -443,7 +446,7 @@ static LRESULT on_remote_mouse_action(int code, WPARAM w, LPARAM l)
 						msg.t = NM_MSG_MOUSE;
 						msg.mouse.x = relative_x;
 						msg.mouse.y = relative_y;
-						msg.mouse.data = mouse_stu->mouseData;
+						msg.mouse.data = mouse_data;
 						msg.mouse.msg = (uint_32_t)w;
 
 						__g_entry[__g_curr_pos].handler(&msg, __g_entry[__g_curr_pos].ctx);

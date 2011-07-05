@@ -70,9 +70,10 @@ LRESULT CALLBACK mouse_proc(int code, WPARAM w, LPARAM l)
 		{
 				return CallNextHookEx (g_kb_hook, code, w, l);
 		}
-
+		
+		short mouseData = 0;
 		const char *info = NULL;
-		/*
+		
 		switch(w)
 		{
 		case WM_LBUTTONDOWN:
@@ -86,9 +87,11 @@ LRESULT CALLBACK mouse_proc(int code, WPARAM w, LPARAM l)
 				break;
 		case WM_MOUSEWHEEL:
 				info = "WM_MOUSEWHEEL";
+				mouseData = (short)((mouse_stu->mouseData >> 16) & 0xffff);
 				break;
 		case WM_MOUSEHWHEEL:
 				info = "WM_MOUSEHWHEEL";
+				//delta = HIWORD(mouse_stu->mouseData);
 				break;
 		case WM_RBUTTONDOWN:
 				info = "WM_RBUTTONDOWN";
@@ -104,10 +107,13 @@ LRESULT CALLBACK mouse_proc(int code, WPARAM w, LPARAM l)
 		if(info)
 		{
 				printf ("%s\r\n", info);
+				if(w == WM_MOUSEWHEEL || w == WM_MOUSEHWHEEL)
+				{
+						printf("detal == %d\r\n", mouseData);
+				}
 		}
-
-		*/
-		
+		return CallNextHookEx (g_kb_hook, code, w, l);
+#if(0)
 		if(w == WM_MOUSEMOVE)
 		{
 				static bool_t is_init = false;
@@ -160,7 +166,8 @@ LRESULT CALLBACK mouse_proc(int code, WPARAM w, LPARAM l)
 				return 1;
 		}
 
-		
+#endif
+
 }
 
 
@@ -310,10 +317,10 @@ void hook_and_sendinput_test()
 void Hook_Test()
 {
 		
-		hook_and_sendinput_test();
+		//hook_and_sendinput_test();
 
 		//hook_display_test();
 
-		//hook_test1();
+		hook_test1();
 
 }
