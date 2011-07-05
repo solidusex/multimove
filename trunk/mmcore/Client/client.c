@@ -31,7 +31,7 @@ static void	client_io_thread_func(void *data);
 static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx);
 
 static cmMutex_t		__g_ss_mtx;
-static ss_t				*__g_ss_set[NM_POS_MAX];
+static cliSession_t				*__g_ss_set[NM_POS_MAX];
 static cmThread_t		*__g_working_thread = NULL;
 static bool_t			__g_is_started = false;
 
@@ -114,7 +114,7 @@ bool_t	Cli_Stop()
 bool_t	Cli_InsertServer(nmPosition_t pos, const wchar_t *srv_ip, uint_16_t port)
 {
 		bool_t has_srv;
-		ss_t *ss;
+		cliSession_t *ss;
 		Com_ASSERT(srv_ip != NULL);
 
 
@@ -157,7 +157,7 @@ bool_t	Cli_InsertServer(nmPosition_t pos, const wchar_t *srv_ip, uint_16_t port)
 
 bool_t	Cli_RemoveServer(nmPosition_t pos)
 {
-		ss_t *ss;
+		cliSession_t *ss;
 		Com_ASSERT(pos < NM_POS_MAX);
 
 		if(!Cli_IsStarted())
@@ -241,7 +241,7 @@ static void	client_io_thread_func(void *data)
 				Com_LockMutex(&__g_ss_mtx);
 				for(i = 0; i < NM_POS_MAX; ++i)
 				{
-						ss_t *ss = __g_ss_set[i];
+						cliSession_t *ss = __g_ss_set[i];
 						if(!ss)
 						{
 								continue;
@@ -285,7 +285,7 @@ static void	client_io_thread_func(void *data)
 						Com_LockMutex(&__g_ss_mtx);
 						for(i = 0; i < NM_POS_MAX; ++i)
 						{
-								ss_t *ss = __g_ss_set[i];
+								cliSession_t *ss = __g_ss_set[i];
 								if(!ss)
 								{
 										continue;
@@ -311,7 +311,7 @@ static void	client_io_thread_func(void *data)
 
 						for(k = 0; k < NM_POS_MAX; ++k)
 						{
-								ss_t *ss = __g_ss_set[k];
+								cliSession_t *ss = __g_ss_set[k];
 
 								if(ss)
 								{
@@ -328,7 +328,7 @@ static void	client_io_thread_func(void *data)
 
 						for(k = 0; k < NM_POS_MAX; ++k)
 						{
-								ss_t *ss = __g_ss_set[k];
+								cliSession_t *ss = __g_ss_set[k];
 
 								if(ss)
 								{
@@ -361,11 +361,11 @@ static void	client_io_thread_func(void *data)
 
 static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx)
 {
-		ss_t *ss;
+		cliSession_t *ss;
 		Com_ASSERT(ctx != NULL && msg != NULL);
 		//Com_printf(L"On hook_dispatch\r\n");
 
-		ss = (ss_t*)ctx;
+		ss = (cliSession_t*)ctx;
 		
 		if(!SS_IsHandshaked(ss))
 		{
@@ -383,11 +383,11 @@ static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx)
 				return false;
 				break;
 		case NM_MSG_ENTER:
-				return SS_SendEnterMsg((ss_t*)ctx, msg);
+				return SS_SendEnterMsg((cliSession_t*)ctx, msg);
 		case NM_MSG_MOUSE:
-				return SS_SendMouseMsg((ss_t*)ctx, msg);
+				return SS_SendMouseMsg((cliSession_t*)ctx, msg);
 		case NM_MSG_KEYBOARD:
-				return SS_SendKeyboardMsg((ss_t*)ctx, msg);
+				return SS_SendKeyboardMsg((cliSession_t*)ctx, msg);
 		}
 }
 
