@@ -229,8 +229,9 @@ RECHECK_POINT:
 								
 								package_len = COM_NTOL_U16(package_len);
 
-								if(package_len > 1 * COM_KB || package_len < 1)/*包过大或过小*/
+								if(package_len > 10 * COM_MB || package_len < 1)/*包过大或过小*/
 								{
+										Com_error(COM_ERR_WARNING, L"Invalid package size : %d\r\n", package_len);
 										is_ok = false;
 										goto END_POINT;
 								}else
@@ -290,17 +291,19 @@ static bool_t	__set_clipboard_data(const nmMsg_t *msg)
 
 		if(!OpenClipboard(NULL))
 		{
-				Com_error(COM_ERR_WARNING, L"OpenClipboard failed\r\n");
+				Com_error(COM_ERR_WARNING, L"OpenClipboard failed error code : %d\r\n", GetLastError());
 				is_ok = false;
 				goto END_POINT;
 		}
 
+		
 		if(!EmptyClipboard())
 		{
-				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed\r\n");
+				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed error code %d\r\n", GetLastError());
 				is_ok = false;
 				goto END_POINT;
 		}
+		
 
 
 		utf16 = Com_str_convto_wcs(COM_CP_UTF8, (const char*)msg->clip_data.data, msg->clip_data.length);
