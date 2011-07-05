@@ -264,6 +264,8 @@ END_POINT:
 		return is_ok;
 }
 
+
+
 bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 {
 		nmMsg_t msg;
@@ -298,6 +300,13 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 				break;
 		case NM_MSG_ENTER:
 		{
+				int src_x_fullscreen, src_y_fullscreen;
+				DWORD x_pos, y_pos;
+
+				src_x_fullscreen = GetSystemMetrics(SM_CXSCREEN);
+				src_y_fullscreen = GetSystemMetrics(SM_CYSCREEN);
+
+
 				if(!ss->is_handshaked)
 				{
 						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received NM_MSG_ENTER request before handshake, connection terminated\r\n", ss->ip, ss->port);
@@ -318,14 +327,29 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						return false;
 						goto END_POINT;
 				}
+
 				
-				if(ss->pos == NM_POS_RIGHT)
+				switch(ss->pos)
 				{
-						mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, 10 * 65535 / msg.enter.src_x_fullscreen, (DWORD)(msg.enter.y * 65535 / msg.enter.src_y_fullscreen), 0, 0);
-				}else if(ss->pos == NM_POS_LEFT)
-				{
-						mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, (msg.enter.src_x_fullscreen - 10) * 65535 / msg.enter.src_x_fullscreen, (DWORD)(msg.enter.y * 65535 / msg.enter.src_y_fullscreen), 0, 0);
+				case NM_POS_LEFT:/*如果我在左面，则指针从右面出来*/
+						x_pos = (src_x_fullscreen - 10) * 65535 / src_x_fullscreen;
+						y_pos = msg.enter.y * 65535 / msg.enter.src_y_fullscreen;
+				case NM_POS_RIGHT:/*如果我在右面，则指针从左面出来*/
+						x_pos = 10 * 65535 / src_x_fullscreen;
+						y_pos = msg.enter.y * 65535 / msg.enter.src_y_fullscreen;
+				case NM_POS_UP:
+						x_pos = msg.enter.x * 65535 / msg.enter.src_x_fullscreen;
+						y_pos = (src_y_fullscreen - 10) * 65535 / src_y_fullscreen;
+				case NM_POS_DOWN:
+						x_pos = msg.enter.x * 65535 / msg.enter.src_x_fullscreen;
+						y_pos = 10 * 65535 / src_y_fullscreen;
+				default:
+						x_pos = 0;
+						y_pos = 0;
+						Com_ASSERT(false);
 				}
+				
+				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, x_pos, y_pos, 0, 0);
 				ss->is_entered = true;
 		}
 				break;
@@ -351,14 +375,14 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 				{
 
 						bool_t need_send_leave = false;
-						int src_x_fullscrenn, src_y_fullscreen;
+						int src_x_fullscreen, src_y_fullscreen;
 						POINT pt;
-						src_x_fullscrenn = GetSystemMetrics(SM_CXSCREEN);
+						src_x_fullscreen = GetSystemMetrics(SM_CXSCREEN);
 						src_y_fullscreen = GetSystemMetrics(SM_CYSCREEN);
 				
 						GetCursorPos(&pt);
 				
-						if(ss->pos == NM_POS_LEFT && pt.x >= src_x_fullscrenn - 1 && msg.mouse.x > 0)
+						if(ss->pos == NM_POS_LEFT && pt.x >= src_x_fullscreen - 1 && msg.mouse.x > 0)
 						{
 								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
 								need_send_leave = true;
@@ -370,11 +394,23 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 								need_send_leave = true;
 						}
 
+						if(ss->pos == NM_POS_UP && pt.y <= 0 && msg.mouse.y < 0)
+						{
+								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
+								need_send_leave = true;
+						}
+
+						if(ss->pos == NM_POS_DOWN && pt.y >= src_y_fullscreen - 1 && msg.mouse.y > 0)
+						{
+								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
+								need_send_leave = true;
+						}
+
 						if(need_send_leave)
 						{
 								nmMsg_t leave_msg;
 								leave_msg.t = NM_MSG_LEAVE;
-								leave_msg.leave.src_x_fullscreen = src_x_fullscrenn;
+								leave_msg.leave.src_x_fullscreen = src_x_fullscreen;
 								leave_msg.leave.src_y_fullscreen = src_y_fullscreen;
 								leave_msg.leave.x = pt.x;
 								leave_msg.leave.y = pt.y;

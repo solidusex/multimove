@@ -12,7 +12,8 @@ typedef enum
 {
 		NM_POS_LEFT = 0x00,
 		NM_POS_RIGHT,
-		
+		NM_POS_UP,
+		NM_POS_DOWN,
 		NM_POS_MAX
 }nmPosition_t;
 

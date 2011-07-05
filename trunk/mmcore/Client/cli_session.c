@@ -389,8 +389,10 @@ bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
 		case NM_MSG_LEAVE:
 		{
 				int x_full_screen, y_full_screen;
+				DWORD mouse_pos_x, mouse_pos_y;
 				x_full_screen = GetSystemMetrics(SM_CXSCREEN);
 				y_full_screen = GetSystemMetrics(SM_CYSCREEN);
+
 				if(!ss->is_handshaked)
 				{
 						Com_error(COM_ERR_WARNING, L"Session (%s:%d) received NM_MSG_LEAVE request before handshake, connection terminated\r\n", ss->ip, ss->port);
@@ -404,7 +406,33 @@ bool_t		SS_HandleRecvBuffer(ss_t *ss, const byte_t *data, size_t length)
 						goto END_POINT;
 				}
 				
-				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, ss->for_position == NM_POS_LEFT ? 2 * 65535 / x_full_screen : (x_full_screen - 2) * 65535 / x_full_screen, (DWORD)(msg.leave.y * 65535 / msg.leave.src_y_fullscreen), 0, 0);
+
+				switch(ss->for_position)
+				{
+				case NM_POS_LEFT: /*server在左侧，则从左侧回来，将鼠标设置到左侧*/
+						mouse_pos_x = 2 * 65535 / x_full_screen;
+						mouse_pos_y = msg.leave.y * 65535 / msg.leave.src_y_fullscreen;
+						break;
+				case NM_POS_RIGHT:
+						mouse_pos_x = (x_full_screen - 2) * 65535 / x_full_screen;
+						mouse_pos_y = msg.leave.y * 65535 / msg.leave.src_y_fullscreen;
+						break;
+				case NM_POS_UP:/*server在上面，则从上面回来，将鼠标设置到上面*/
+						mouse_pos_x = msg.leave.x * 65535 / msg.leave.src_x_fullscreen;
+						mouse_pos_y = 2 * 65535 / y_full_screen;
+						break;
+				case NM_POS_DOWN:
+						mouse_pos_x = msg.leave.x * 65535 / msg.leave.src_x_fullscreen;
+						mouse_pos_y = (y_full_screen - 2) * 65535 / y_full_screen;
+						break;
+				default:
+						Com_error(COM_ERR_WARNING, L"Session (%s:%d) received invalid NM_MSG_LEAVE, connection terminated\r\n", ss->ip, ss->port);
+						is_ok = false;
+						goto END_POINT;
+						break;
+
+				}
+				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, mouse_pos_x, mouse_pos_y, 0, 0);
 				Hook_Cli_ControlReturn();
 
 		}
