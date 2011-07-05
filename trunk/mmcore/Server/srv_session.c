@@ -352,7 +352,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 				
 						GetCursorPos(&pt);
 				
-						if(ss->pos == NM_POS_LEFT && pt.x >= src_x_fullscrenn && msg.mouse.x > 0)
+						if(ss->pos == NM_POS_LEFT && pt.x >= src_x_fullscrenn - 1 && msg.mouse.x > 0)
 						{
 								Com_printf(L"Session (%s:%d) send mouse leave msg to client\r\n", ss->ip, ss->port);
 								need_send_leave = true;

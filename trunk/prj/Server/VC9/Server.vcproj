@@ -439,14 +439,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\mmcore\Server\srv_hook.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Server\srv_hook.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\mmcore\Server\srv_session.c"
 				>
 			</File>
