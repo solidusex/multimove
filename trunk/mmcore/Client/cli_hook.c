@@ -20,6 +20,8 @@ struct {
 }__g_entry[NM_POS_MAX] = 
 {
 		{ NULL, NULL},
+		{NULL, NULL},
+		{NULL, NULL},
 		{NULL, NULL}
 };
 
@@ -265,6 +267,12 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 		{
 		case WM_MOUSEMOVE:
 		{
+				nmMsg_t	msg;
+				msg.t = NM_MSG_ENTER;
+				msg.enter.src_x_fullscreen = x_full_screen;
+				msg.enter.src_y_fullscreen = y_full_screen;
+				msg.enter.x = mouse_stu->pt.x;
+				msg.enter.y = mouse_stu->pt.y;
 				if(mouse_stu->pt.x < 0)
 				{
 						Com_printf(L"Shift trigger point on : (%d:%d) to left\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
@@ -273,14 +281,6 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 
 						if(__g_entry[NM_POS_LEFT].handler != NULL)
 						{
-								nmMsg_t	msg;
-								msg.t = NM_MSG_ENTER;
-								msg.enter.src_x_fullscreen = x_full_screen;
-								msg.enter.src_y_fullscreen = y_full_screen;
-								msg.enter.x = mouse_stu->pt.x;
-								msg.enter.y = mouse_stu->pt.y;
-
-								
 								if(__g_entry[NM_POS_LEFT].handler(&msg, __g_entry[NM_POS_LEFT].ctx))
 								{
 										__g_state    = HK_STATE_REMOTE;
@@ -301,13 +301,6 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 
 						if(__g_entry[NM_POS_RIGHT].handler != NULL)
 						{
-								nmMsg_t	msg;
-								msg.t = NM_MSG_ENTER;
-								msg.enter.src_x_fullscreen = x_full_screen;
-								msg.enter.src_y_fullscreen = y_full_screen;
-								msg.enter.x = mouse_stu->pt.x;
-								msg.enter.y = mouse_stu->pt.y;
-
 								if(__g_entry[NM_POS_RIGHT].handler(&msg, __g_entry[NM_POS_RIGHT].ctx))
 								{
 										__g_state    = HK_STATE_REMOTE;
@@ -321,19 +314,12 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 						return CallNextHookEx(__g_mouse_hook, code, w, l);
 				}else if(mouse_stu->pt.y < 0)
 				{
-						Com_printf(L"Shift trigger point on : (%d:%d) to right\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
+						Com_printf(L"Shift trigger point on : (%d:%d) to up\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
 						Com_LockMutex(&__g_lock);
 
 						if(__g_entry[NM_POS_UP].handler != NULL)
 						{
-								nmMsg_t	msg;
-								msg.t = NM_MSG_ENTER;
-								msg.enter.src_x_fullscreen = x_full_screen;
-								msg.enter.src_y_fullscreen = y_full_screen;
-								msg.enter.x = mouse_stu->pt.x;
-								msg.enter.y = mouse_stu->pt.y;
-
 								if(__g_entry[NM_POS_UP].handler(&msg, __g_entry[NM_POS_UP].ctx))
 								{
 										__g_state    = HK_STATE_REMOTE;
@@ -349,19 +335,12 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 
 				}else if(mouse_stu->pt.y > y_full_screen)
 				{
-						Com_printf(L"Shift trigger point on : (%d:%d) to right\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
+						Com_printf(L"Shift trigger point on : (%d:%d) to down\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
 						
 						Com_LockMutex(&__g_lock);
 
 						if(__g_entry[NM_POS_DOWN].handler != NULL)
 						{
-								nmMsg_t	msg;
-								msg.t = NM_MSG_ENTER;
-								msg.enter.src_x_fullscreen = x_full_screen;
-								msg.enter.src_y_fullscreen = y_full_screen;
-								msg.enter.x = mouse_stu->pt.x;
-								msg.enter.y = mouse_stu->pt.y;
-
 								if(__g_entry[NM_POS_DOWN].handler(&msg, __g_entry[NM_POS_DOWN].ctx))
 								{
 										__g_state    = HK_STATE_REMOTE;
