@@ -204,14 +204,14 @@ static void	hook_thread_func(void *data)
 		Com_ASSERT(__g_hook_thread_id == GetCurrentThreadId());
 
 		
-		/*
+		
 		__g_keyboard_hook = SetWindowsHookEx (WH_KEYBOARD_LL, (HOOKPROC)&keyboard_hook_func, GetModuleHandle(NULL), 0);
 		
 		if(__g_keyboard_hook == NULL)
 		{
 				Com_error(COM_ERR_FATAL, L"Hook keyboard failed : error code (%d)\r\n", GetLastError());
 		}
-		*/
+		
 		
 
 		__g_mouse_hook = SetWindowsHookEx(WH_MOUSE_LL, (HOOKPROC)&mouse_hook_func,GetModuleHandle(NULL), 0);
@@ -236,10 +236,8 @@ static void	hook_thread_func(void *data)
 				DispatchMessage (&msg);
 		};
 		
-		/*
+		
 		UnhookWindowsHookEx(__g_keyboard_hook);
-		*/
-
 		UnhookWindowsHookEx(__g_mouse_hook);
 		
 }
