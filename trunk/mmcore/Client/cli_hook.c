@@ -3,6 +3,8 @@
 
 
 
+
+
 typedef enum 
 {
 		HK_STATE_STOP			= 0x00,
@@ -277,16 +279,15 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 								msg.enter.src_y_fullscreen = y_full_screen;
 								msg.enter.x = mouse_stu->pt.x;
 								msg.enter.y = mouse_stu->pt.y;
-								
-								__g_state    = HK_STATE_REMOTE;
-								__g_curr_pos = NM_POS_LEFT;
-								__g_prev_pt = mouse_stu->pt;
 
-								__g_entry[NM_POS_LEFT].handler(&msg, __g_entry[NM_POS_LEFT].ctx);
 								
-								
-								
-								Com_printf(L"Shift to left side\r\n");
+								if(__g_entry[NM_POS_LEFT].handler(&msg, __g_entry[NM_POS_LEFT].ctx))
+								{
+										__g_state    = HK_STATE_REMOTE;
+										__g_curr_pos = NM_POS_LEFT;
+										__g_prev_pt = mouse_stu->pt;
+										Com_printf(L"Shift to left side\r\n");
+								}
 						}
 						Com_UnLockMutex(&__g_lock);
 
@@ -307,13 +308,13 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 								msg.enter.x = mouse_stu->pt.x;
 								msg.enter.y = mouse_stu->pt.y;
 
-								__g_entry[NM_POS_RIGHT].handler(&msg, __g_entry[NM_POS_RIGHT].ctx);
-								
-								__g_state    = HK_STATE_REMOTE;
-								__g_curr_pos = NM_POS_RIGHT;
-								__g_prev_pt = mouse_stu->pt;
-								
-								Com_printf(L"Shift to right side\r\n");
+								if(__g_entry[NM_POS_RIGHT].handler(&msg, __g_entry[NM_POS_RIGHT].ctx))
+								{
+										__g_state    = HK_STATE_REMOTE;
+										__g_curr_pos = NM_POS_RIGHT;
+										__g_prev_pt = mouse_stu->pt;
+										Com_printf(L"Shift to right side\r\n");
+								}
 						}
 						Com_UnLockMutex(&__g_lock);
 
@@ -333,11 +334,12 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 								msg.enter.x = mouse_stu->pt.x;
 								msg.enter.y = mouse_stu->pt.y;
 
-								__g_entry[NM_POS_UP].handler(&msg, __g_entry[NM_POS_UP].ctx);
-								
-								__g_state    = HK_STATE_REMOTE;
-								__g_curr_pos = NM_POS_UP;
-								__g_prev_pt = mouse_stu->pt;
+								if(__g_entry[NM_POS_UP].handler(&msg, __g_entry[NM_POS_UP].ctx))
+								{
+										__g_state    = HK_STATE_REMOTE;
+										__g_curr_pos = NM_POS_UP;
+										__g_prev_pt = mouse_stu->pt;
+								}
 								
 								Com_printf(L"Shift to up side\r\n");
 						}
@@ -360,13 +362,15 @@ static LRESULT on_normal_mouse_action(int code, WPARAM w, LPARAM l)
 								msg.enter.x = mouse_stu->pt.x;
 								msg.enter.y = mouse_stu->pt.y;
 
-								__g_entry[NM_POS_DOWN].handler(&msg, __g_entry[NM_POS_DOWN].ctx);
-								
-								__g_state    = HK_STATE_REMOTE;
-								__g_curr_pos = NM_POS_DOWN;
-								__g_prev_pt = mouse_stu->pt;
-								
-								Com_printf(L"Shift to up side\r\n");
+								if(__g_entry[NM_POS_DOWN].handler(&msg, __g_entry[NM_POS_DOWN].ctx))
+								{
+										__g_state    = HK_STATE_REMOTE;
+										__g_curr_pos = NM_POS_DOWN;
+										__g_prev_pt = mouse_stu->pt;
+										
+										Com_printf(L"Shift to up side\r\n");
+								}
+
 						}
 						Com_UnLockMutex(&__g_lock);
 

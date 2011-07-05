@@ -7,6 +7,11 @@ MM_NAMESPACE_BEGIN
 
 
 
+
+
+
+/*****************************************************************************************************************/
+
 ss_t*		SS_ConnectSession(nmPosition_t	pos, const wchar_t			*ip, uint_16_t		port)
 {
 		ss_t *ss = NULL;
@@ -109,6 +114,12 @@ bool_t		SS_IsActive(const ss_t *ss)
 		Com_ASSERT(ss != NULL);
 		return ss->is_active;
 
+}
+
+bool_t		SS_IsHandshaked(const ss_t *ss)
+{
+		Com_ASSERT(ss != NULL);
+		return ss->is_handshaked;
 }
 
 bool_t		SS_HasDataToSend(ss_t *ss)		/*out_buf是否存在数据*/

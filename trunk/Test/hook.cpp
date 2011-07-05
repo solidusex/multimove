@@ -64,7 +64,7 @@ LRESULT CALLBACK mouse_proc(int code, WPARAM w, LPARAM l)
 		int y_full_screen = GetSystemMetrics(SM_CYSCREEN);
 		MSLLHOOKSTRUCT *mouse_stu = (MSLLHOOKSTRUCT*)l;
 		
-		//::ShowCursor(FALSE);
+		::ShowCursor(FALSE);
 
 		if(code < 0)
 		{
