@@ -344,7 +344,6 @@ static void	client_io_thread_func(void *data)
 
 						}
 
-						
 						Com_UnLockMutex(&__g_ss_mtx);
 				}
 		}

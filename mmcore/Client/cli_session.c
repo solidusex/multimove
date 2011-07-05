@@ -147,6 +147,11 @@ void			SS_CloseSession(cliSession_t *ss)
 {
 		Com_ASSERT(ss != NULL);
 		
+		if(SS_IsActive(ss))
+		{
+				__show_cursor();
+		}
+
 		Com_DEL(ss->ip);
 		ss->ip = NULL;
 		closesocket(ss->sockfd);
