@@ -118,6 +118,78 @@ bool_t	Hook_Cli_IsStarted()
 
 
 
+
+bool_t	Hook_Cli_RegisterHandler(nmPosition_t	pos, void	*ctx, hkMsgHander_t	on_msg)
+{
+		Com_ASSERT(pos < NM_POS_MAX && on_msg != NULL);
+		
+		Com_ASSERT(Hook_Cli_IsStarted());
+		
+		if(!Hook_Cli_IsStarted())
+		{
+				return false;
+		}
+
+		if(__g_entry[pos].handler != NULL)
+		{
+				return false;
+		}
+		
+		Com_LockMutex(&__g_lock);
+		__g_entry[pos].handler = on_msg;
+		__g_entry[pos].ctx = ctx;
+		Com_UnLockMutex(&__g_lock);
+		return true;
+}
+
+
+bool_t	Hook_Cli_UnRegisterHandler(nmPosition_t	pos)
+{
+		
+		Com_ASSERT(pos < NM_POS_MAX);
+		Com_ASSERT(Hook_Cli_IsStarted());
+		
+		if(!Hook_Cli_IsStarted())
+		{
+				return false;
+		}
+
+		if(__g_entry[pos].handler == NULL)
+		{
+				return false;
+		}
+
+		Com_LockMutex(&__g_lock);
+		__g_entry[pos].handler = NULL;
+		__g_entry[pos].ctx = NULL;
+		Com_UnLockMutex(&__g_lock);
+		return true;
+}
+
+
+
+
+
+bool_t	Hook_Cli_ControlReturn()
+{
+		Com_ASSERT(Hook_Cli_IsStarted());
+
+		if(!Hook_Cli_IsStarted())
+		{
+				return false;
+		}
+
+		Com_LockMutex(&__g_lock);
+		__g_state = HK_STATE_NORMAL;
+		Com_UnLockMutex(&__g_lock);
+
+		return true;
+}
+
+
+
+
+
 static LRESULT CALLBACK keyboard_hook_func(int code, WPARAM w, LPARAM l);
 static LRESULT CALLBACK mouse_hook_func(int code, WPARAM w, LPARAM l);
 
@@ -132,12 +204,14 @@ static void	hook_thread_func(void *data)
 		Com_ASSERT(__g_hook_thread_id == GetCurrentThreadId());
 
 		
+		/*
 		__g_keyboard_hook = SetWindowsHookEx (WH_KEYBOARD_LL, (HOOKPROC)&keyboard_hook_func, GetModuleHandle(NULL), 0);
 		
 		if(__g_keyboard_hook == NULL)
 		{
 				Com_error(COM_ERR_FATAL, L"Hook keyboard failed : error code (%d)\r\n", GetLastError());
 		}
+		*/
 		
 
 		__g_mouse_hook = SetWindowsHookEx(WH_MOUSE_LL, (HOOKPROC)&mouse_hook_func,GetModuleHandle(NULL), 0);
@@ -162,7 +236,10 @@ static void	hook_thread_func(void *data)
 				DispatchMessage (&msg);
 		};
 		
-		/*UnhookWindowsHookEx(__g_keyboard_hook);*/
+		/*
+		UnhookWindowsHookEx(__g_keyboard_hook);
+		*/
+
 		UnhookWindowsHookEx(__g_mouse_hook);
 		
 }
@@ -499,72 +576,3 @@ static LRESULT CALLBACK keyboard_hook_func(int code, WPARAM w, LPARAM l)
 
 
 
-
-
-
-bool_t	Hook_Cli_RegisterHandler(nmPosition_t	pos, void	*ctx, hkMsgHander_t	on_msg)
-{
-		Com_ASSERT(pos < NM_POS_MAX && on_msg != NULL);
-		
-		Com_ASSERT(Hook_Cli_IsStarted());
-		
-		if(!Hook_Cli_IsStarted())
-		{
-				return false;
-		}
-
-		if(__g_entry[pos].handler != NULL)
-		{
-				return false;
-		}
-		
-		Com_LockMutex(&__g_lock);
-		__g_entry[pos].handler = on_msg;
-		__g_entry[pos].ctx = ctx;
-		Com_UnLockMutex(&__g_lock);
-		return true;
-}
-
-
-bool_t	Hook_Cli_UnRegisterHandler(nmPosition_t	pos)
-{
-		
-		Com_ASSERT(pos < NM_POS_MAX);
-		Com_ASSERT(Hook_Cli_IsStarted());
-		
-		if(!Hook_Cli_IsStarted())
-		{
-				return false;
-		}
-
-		if(__g_entry[pos].handler == NULL)
-		{
-				return false;
-		}
-
-		Com_LockMutex(&__g_lock);
-		__g_entry[pos].handler = NULL;
-		__g_entry[pos].ctx = NULL;
-		Com_UnLockMutex(&__g_lock);
-		return true;
-}
-
-
-
-
-
-bool_t	Hook_Cli_ControlReturn()
-{
-		Com_ASSERT(Hook_Cli_IsStarted());
-
-		if(!Hook_Cli_IsStarted())
-		{
-				return false;
-		}
-
-		Com_LockMutex(&__g_lock);
-		__g_state = HK_STATE_NORMAL;
-		Com_UnLockMutex(&__g_lock);
-
-		return true;
-}
