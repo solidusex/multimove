@@ -186,6 +186,8 @@ bool_t	Com_UnInit();
 #define			Com_ASSERT(_cond)		assert((_cond))
 #define			Com_DebugOutput			OutputDebugStringW
 #define			Com_DebugBreak			DebugBreak
+
+
 #else
 
 #if(_MSC_VER < 1300)

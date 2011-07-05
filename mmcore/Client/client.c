@@ -361,9 +361,17 @@ static void	client_io_thread_func(void *data)
 
 static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx)
 {
+		ss_t *ss;
 		Com_ASSERT(ctx != NULL && msg != NULL);
 		//Com_printf(L"On hook_dispatch\r\n");
 
+		ss = (ss_t*)ctx;
+		
+		if(!SS_IsHandshaked(ss))
+		{
+				return false;
+		}
+		
 		switch(msg->t)
 		{
 		case NM_MSG_KEEPALIVE:

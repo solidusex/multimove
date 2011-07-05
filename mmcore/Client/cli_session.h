@@ -40,6 +40,7 @@ typedef struct __session_tag
 ss_t*		SS_ConnectSession(nmPosition_t	dir, const wchar_t			*ip, uint_16_t		port); /*会阻塞至多SS_CONNECT_TO_SRV_TIMEOUT秒钟*/
 void		SS_CloseSession(ss_t *ss);
 bool_t		SS_IsActive(const ss_t *ss);
+bool_t		SS_IsHandshaked(const ss_t *ss);
 
 bool_t		SS_HasDataToSend(ss_t *ss);		/*out_buf是否存在数据*/
 bool_t		SS_RecvData(ss_t *ss);		/*从sockfd以非阻塞方式接收对端数据，放入in_buf数据,并进行后续处理*/
