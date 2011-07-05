@@ -276,6 +276,58 @@ END_POINT:
 }
 
 
+static bool_t	__set_clipboard_data(const nmMsg_t *msg)
+{
+		wchar_t *utf16;
+		size_t l;
+		HGLOBAL hglb;
+		if(!OpenClipboard(NULL))
+		{
+				Com_error(COM_ERR_WARNING, L"OpenClipboard failed\r\n");
+				return false;
+		}
+
+		if(!EmptyClipboard())
+		{
+				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed\r\n");
+				return false;
+		}
+
+
+		utf16 = Com_str_convto_wcs(COM_CP_UTF8, (const char*)msg->clip_data.data, msg->clip_data.length);
+		if(utf16 == NULL)
+		{
+				Com_error(COM_ERR_WARNING, L"Invlaid clipboard data\r\n");
+				return false;
+		}
+		
+		l = Com_wcslen(utf16);
+
+		if(l == 0)
+		{
+				Com_DEL(utf16);
+				return true;
+		}
+
+		hglb = GlobalAlloc(GMEM_DDESHARE, (l +1) * sizeof(wchar_t));
+		if (hglb != NULL) 
+		{
+				wchar_t *dest = (wchar_t*) GlobalLock(hglb);
+				Com_wcscpy(dest, utf16);
+				GlobalUnlock(hglb);
+				SetClipboardData(CF_UNICODETEXT, hglb);
+		}
+
+		if(utf16)
+		{
+				Com_DEL(utf16);
+				utf16 = NULL;
+		}
+
+		return CloseClipboard() ? true : false;
+}
+
+
 
 bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 {
@@ -504,6 +556,9 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 
 				return true;
 		}
+				break;
+		case NM_MSG_CLIPDATA:
+				__set_clipboard_data(&msg);
 				break;
 		case NM_MSG_HANDSHAKE_REPLY:
 		case NM_MSG_LEAVE:

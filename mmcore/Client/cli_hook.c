@@ -3,7 +3,7 @@
 
 
 
-
+MM_NAMESPACE_BEGIN
 
 typedef enum 
 {
@@ -14,7 +14,7 @@ typedef enum
 
 
 
-struct {
+static  struct {
 		void					*ctx;
 		hkMsgHander_t			handler;
 }__g_entry[NM_POS_MAX] = 
@@ -125,6 +125,7 @@ bool_t	Hook_Cli_IsStarted()
 
 bool_t	Hook_Cli_RegisterHandler(nmPosition_t	pos, void	*ctx, hkMsgHander_t	on_msg)
 {
+		bool_t ret;
 		Com_ASSERT(pos < NM_POS_MAX && on_msg != NULL);
 		
 		Com_ASSERT(Hook_Cli_IsStarted());
@@ -134,14 +135,20 @@ bool_t	Hook_Cli_RegisterHandler(nmPosition_t	pos, void	*ctx, hkMsgHander_t	on_ms
 				return false;
 		}
 
+		ret = true;
+
+		Com_LockMutex(&__g_lock);
+
 		if(__g_entry[pos].handler != NULL)
 		{
-				return false;
+				Com_printf(L"Invalid Hook_Cli_RegisterHandler Call\r\n");
+				ret = false;
+		}else
+		{
+				__g_entry[pos].handler = on_msg;
+				__g_entry[pos].ctx = ctx;
 		}
-		
-		Com_LockMutex(&__g_lock);
-		__g_entry[pos].handler = on_msg;
-		__g_entry[pos].ctx = ctx;
+
 		Com_UnLockMutex(&__g_lock);
 		return true;
 }
@@ -154,11 +161,6 @@ bool_t	Hook_Cli_UnRegisterHandler(nmPosition_t	pos)
 		Com_ASSERT(Hook_Cli_IsStarted());
 		
 		if(!Hook_Cli_IsStarted())
-		{
-				return false;
-		}
-
-		if(__g_entry[pos].handler == NULL)
 		{
 				return false;
 		}
@@ -612,5 +614,7 @@ static LRESULT CALLBACK keyboard_hook_func(int code, WPARAM w, LPARAM l)
 
 }
 
+
+MM_NAMESPACE_END
 
 

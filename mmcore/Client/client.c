@@ -1,5 +1,7 @@
 
 #include "cli_hook.h"
+#include "cli_wndsrv.h"
+
 #include "client.h"
 #include "cli_session.h"
 
@@ -58,6 +60,13 @@ bool_t	Cli_Start()
 				return false;
 		}
 
+		if(!WND_Cli_Start())
+		{
+				Com_ASSERT(false);
+				return false;
+		}
+		
+
 		Com_InitMutex(&__g_ss_mtx);
 		Com_memset(__g_ss_set, 0, sizeof(__g_ss_set));
 		__g_is_started = true;
@@ -89,12 +98,22 @@ bool_t	Cli_Stop()
 				if(__g_ss_set[i] != NULL)
 				{
 						Hook_Cli_UnRegisterHandler((nmPosition_t)i);
+						WND_Cli_UnRegisterHandler((nmPosition_t)i);
 						SS_CloseSession(__g_ss_set[i]);
 						__g_ss_set[i] = NULL;
 				}
 		}
 
+
+
+
 		if(!Hook_Cli_Stop())
+		{
+				Com_ASSERT(false);
+				return false;
+		}
+
+		if(!WND_Cli_Stop())
 		{
 				Com_ASSERT(false);
 				return false;
@@ -149,6 +168,12 @@ bool_t	Cli_InsertServer(nmPosition_t pos, const wchar_t *srv_ip, uint_16_t port)
 		{
 				Com_error(COM_ERR_FATAL, L"Internal Error : Hook_Cli_RegisterDispatch Failed\r\n");
 		}
+
+		if(!WND_Cli_RegisterHandler(pos, (void*)ss, hook_dispatch))
+		{
+				Com_error(COM_ERR_FATAL, L"Internal Error : Hook_Cli_RegisterDispatch Failed\r\n");
+		}
+
 		Com_UnLockMutex(&__g_ss_mtx);
 		return true;
 }
@@ -175,6 +200,12 @@ bool_t	Cli_RemoveServer(nmPosition_t pos)
 		{
 				Com_error(COM_ERR_FATAL, L"Internal Error : Hook_Cli_UnRegisterHandler Failed\r\n");
 		}
+
+		if(!WND_Cli_UnRegisterHandler(pos))
+		{
+				Com_error(COM_ERR_FATAL, L"Internal Error : WND_Cli_UnRegisterHandler Failed\r\n");
+		}
+
 		
 		ss = __g_ss_set[pos];
 		__g_ss_set[pos] = NULL;
@@ -382,16 +413,22 @@ static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx)
 				return false;
 				break;
 		case NM_MSG_ENTER:
-				return SS_SendEnterMsg((cliSession_t*)ctx, msg);
+				return SS_SendEnterMsg(ss, msg);
 		case NM_MSG_MOUSE:
-				return SS_SendMouseMsg((cliSession_t*)ctx, msg);
+				return SS_SendMouseMsg(ss, msg);
 		case NM_MSG_KEYBOARD:
-				return SS_SendKeyboardMsg((cliSession_t*)ctx, msg);
+				return SS_SendKeyboardMsg(ss, msg);
+		case NM_MSG_CLIPDATA:
+				return SS_SendClipDataMsg(ss, msg);
 		}
+
 }
 
 
 
+
+
+/*************************************************************************/
 
 
 
