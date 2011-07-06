@@ -6,6 +6,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "..\..\Server\VC9\Server.vcproj", "{07325191-A3B8-44BD-B3F5-4EA631298899}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "..\..\Test\VC9\Test.vcproj", "{DE746646-D6E4-4CF4-993E-8873067957E6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{07325191-A3B8-44BD-B3F5-4EA631297766} = {07325191-A3B8-44BD-B3F5-4EA631297766}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{06245E89-AE51-45E5-9B09-517CA1B5349F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

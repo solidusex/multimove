@@ -1,0 +1,21 @@
+LIBRARY   Client
+EXPORTS
+
+
+
+Com_Init
+Com_UnInit
+
+
+Cli_Init
+Cli_UnInit
+Cli_Start
+Cli_Stop
+Cli_InsertServer
+Cli_RemoveServer
+
+
+
+
+NM_MsgToBuffer
+NM_ParseFromBuffer

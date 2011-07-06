@@ -1,0 +1,20 @@
+LIBRARY   Server
+EXPORTS
+
+
+Com_Init
+Com_UnInit
+
+Srv_Init
+Srv_UnInit
+Srv_Start
+Srv_Stop
+Srv_IsStarted
+
+
+
+
+
+
+NM_MsgToBuffer
+NM_ParseFromBuffer

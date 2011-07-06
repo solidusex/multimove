@@ -3,6 +3,7 @@
 #include "cli_hook.h"
 #include "cli_wndsrv.h"
 #include "cli_session.h"
+#include "client.h"
 
 MM_NAMESPACE_BEGIN
 
@@ -25,7 +26,7 @@ static const UINT __g_cursor_id[] =
 };
 
 
-
+#if(0)
 static BOOL __hide_cursor()
 {
 		
@@ -60,6 +61,29 @@ static BOOL __hide_cursor()
 		return TRUE;
 
 }
+#endif
+
+static BOOL __hide_cursor()
+{
+		
+
+		HCURSOR new_cursor = Cli_GetHideCursor();
+
+		if(new_cursor == NULL)
+		{
+				Com_error(COM_ERR_WARNING, L"Can not hide cursor\r\n");
+				return FALSE;
+		}
+
+		for(int i = 0; i < sizeof(__g_cursor_id)/sizeof(__g_cursor_id[0]); ++i)
+		{
+				SetSystemCursor(CopyCursor(new_cursor), __g_cursor_id[i]);
+		}
+		
+		return TRUE;
+
+}
+
 
 static BOOL __show_cursor()
 {
@@ -286,14 +310,14 @@ RECHECK_POINT:
 				{
 				case NM_RECV_WAIT_HEADER:
 				{
-						uint_16_t package_len;
+						uint_32_t package_len;
 
 						if(ss->remain_len <= Com_GetBufferAvailable(ss->in_buf))
 						{
 								p = Com_GetBufferData(ss->in_buf);
 								Com_memcpy((byte_t*)&package_len, p, sizeof(package_len));
 								Com_EraseBuffer(ss->in_buf, sizeof(package_len));
-								package_len = COM_NTOL_U16(package_len);
+								package_len = COM_NTOL_U32(package_len);
 
 								if(package_len > 10 * COM_MB || package_len < 1)/*包过大或过小*/
 								{
@@ -353,7 +377,7 @@ bool_t		SS_OnTimer(cliSession_t *ss) /*返回真为需要继续处理，返回false则从__g_sr
 		}
 		
 
-		if(Com_GetTime_Milliseconds() - ss->last_send_stamp > NM_KEEPALIVE_TIMEOUT - 1000)
+		if(Com_GetTime_Milliseconds() - ss->last_send_stamp > (NM_KEEPALIVE_TIMEOUT - 2000))
 		{
 				Com_printf(L"Session (%s:%d) Send KeepAlive\r\n", ss->ip, ss->port);
 				SS_SendKeepAlive(ss);
@@ -459,6 +483,7 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 {
 		bool_t is_ok;
 		nmMsg_t msg;
+		
 		Com_ASSERT(ss != NULL && data != NULL);
 		
 		if(!NM_ParseFromBuffer(data, length, &msg))
@@ -533,7 +558,7 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 				break;
 		case NM_MSG_CLIPDATA:
 		{
-				Com_printf(L"%ls\r\n", L"Session (%s:%d) received NM_MSG_CLIPDATA");
+				Com_printf(L"Session (%s:%d) received NM_MSG_CLIPDATA", ss->ip, ss->port);
 				
 				if(!ss->is_handshaked)
 				{
@@ -542,7 +567,7 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 						goto END_POINT;
 				}
 				
-				WND_Cli_SetClipboardData(&msg);
+				WND_Cli_SetClipboardData(ss->for_position, &msg);
 
 		}
 				break;

@@ -387,6 +387,10 @@ END_POINT:
 
 static LRESULT CALLBACK window_proc(HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam)
 {
+
+
+		static bool_t is_in_setclipboard_mode = false;
+
 		switch (uMsg)
 		{
 		case WM_DESTROY:
@@ -398,8 +402,14 @@ static LRESULT CALLBACK window_proc(HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARA
 				PostQuitMessage(0);
 				break;
 		case WM_DRAWCLIPBOARD:
-				__on_clipboard_changed();
-				SendMessage(__g_next_clipboard, WM_DRAWCLIPBOARD , 0,0);
+				if(is_in_setclipboard_mode)
+				{
+						is_in_setclipboard_mode = false;
+				}else
+				{
+						__on_clipboard_changed();
+						SendMessage(__g_next_clipboard, WM_DRAWCLIPBOARD , 0,0);
+				}
 				break;
 		case WM_CREATE:
 				__g_wnd = hwnd;
@@ -409,6 +419,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARA
 		{
 				Com_ASSERT(wParam != NULL);
 				Com_printf(L"On WM_SET_CLIPBOARD_MSG\r\n");
+				is_in_setclipboard_mode = true;
 				__set_clipboard_data((const setClipBoardPack_t*)wParam);
 				DestroySetClipBoardPack((setClipBoardPack_t*)wParam);
 		}

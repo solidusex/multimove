@@ -235,7 +235,7 @@ RECHECK_POINT:
 				{
 				case NM_RECV_WAIT_HEADER:
 				{
-						uint_16_t package_len;
+						uint_32_t package_len;
 
 						if(ss->remain_len <= Com_GetBufferAvailable(ss->in_buf))
 						{
@@ -243,7 +243,7 @@ RECHECK_POINT:
 								Com_memcpy((byte_t*)&package_len, p, sizeof(package_len));
 								Com_EraseBuffer(ss->in_buf, sizeof(package_len));
 								
-								package_len = COM_NTOL_U16(package_len);
+								package_len = COM_NTOL_U32(package_len);
 
 								if(package_len > 10 * COM_MB || package_len < 1)/*包过大或过小*/
 								{
@@ -553,7 +553,7 @@ bool_t			SS_OnTimer(srvSession_t *ss)
 		}
 		
 
-		if(Com_GetTime_Milliseconds() - ss->last_out_stamp > NM_KEEPALIVE_TIMEOUT - 1000)
+		if(Com_GetTime_Milliseconds() - ss->last_out_stamp > (NM_KEEPALIVE_TIMEOUT - 2000))
 		{
 				Com_printf(L"Send KeepAlive to client (%s:%d)\r\n", ss->ip, ss->port);
 				SS_SendKeepAlive(ss);

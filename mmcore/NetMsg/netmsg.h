@@ -27,7 +27,7 @@ typedef enum
 
 
 
-#define NM_PACKAGE_HEADER_LENGTH			2
+#define NM_PACKAGE_HEADER_LENGTH			4
 
 typedef enum
 {
