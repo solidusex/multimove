@@ -345,9 +345,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 
 				if(ss->is_entered)
 				{
-						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received multi NM_MSG_ENTER msg, connection terminated\r\n", ss->ip, ss->port);
-						is_ok = false;
-						goto END_POINT;
+						Com_error(COM_ERR_WARNING, L"Session from (%s:%d) received multi NM_MSG_ENTER msg\r\n", ss->ip, ss->port);
 				}
 				
 				if(msg.enter.src_x_fullscreen == 0 || msg.enter.src_y_fullscreen == 0)
