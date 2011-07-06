@@ -366,72 +366,12 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="Common"
-			>
-			<File
-				RelativePath="..\..\..\mmcore\Common\buffer.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\byteorder.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\net.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\strconv.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\textfile.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\Common\thread.c"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="NetMsg"
-			>
-			<File
-				RelativePath="..\..\..\mmcore\NetMsg\netmsg.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\mmcore\NetMsg\netmsg.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Client"
-			>
-		</Filter>
-		<Filter
-			Name="Server"
-			>
-		</Filter>
 		<File
-			RelativePath="..\..\..\Test\CommonTest.cpp"
+			RelativePath=".\blank_cursor.cur"
 			>
 		</File>
 		<File
-			RelativePath="..\..\..\test\hook.cpp"
+			RelativePath="..\..\..\Test\client_test.c"
 			>
 		</File>
 		<File
@@ -443,7 +383,19 @@
 			>
 		</File>
 		<File
+			RelativePath=".\resource.h"
+			>
+		</File>
+		<File
+			RelativePath="..\..\..\Test\server_test.c"
+			>
+		</File>
+		<File
 			RelativePath="..\..\..\Test\test.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Test.rc"
 			>
 		</File>
 	</Files>

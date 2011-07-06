@@ -19,7 +19,7 @@ bool_t	WND_Cli_RegisterHandler(nmPosition_t	pos, void	*ctx, wndMsgHander_t on_ms
 bool_t	WND_Cli_UnRegisterHandler(nmPosition_t	pos);
 
 /*******************************************************/
-bool_t	WND_Cli_SetClipboardData(const nmMsg_t *msg);
+bool_t	WND_Cli_SetClipboardData(nmPosition_t	pos, const nmMsg_t *msg);
 
 
 

@@ -7,12 +7,20 @@
 
 MM_NAMESPACE_BEGIN
 
+static cliInit_t		__g_cli_init = 
+{
+		NULL,
+		NULL,
+		NULL
+};
 
 
 bool_t Cli_Init(const cliInit_t *init)
 {
-		Com_UNUSED(init);
+		
+		Com_ASSERT(init != NULL);
 		Com_printf(L"On Cli_Init\r\n");
+		__g_cli_init = *init;
 		return true;
 }
 
@@ -23,7 +31,10 @@ bool_t Cli_UnInit()
 }
 
 
-
+HCURSOR	Cli_GetHideCursor()
+{
+		return __g_cli_init.hide_cursor;
+}
 
 /************************************************************************************************************************************/
 

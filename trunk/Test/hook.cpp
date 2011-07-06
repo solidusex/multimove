@@ -1,4 +1,4 @@
-
+#if(0)
 #define OEMRESOURCE
 
 #include "test.h"
@@ -324,3 +324,4 @@ void Hook_Test()
 		hook_test1();
 
 }
+#endif

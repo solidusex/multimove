@@ -3,12 +3,28 @@
 
 #include "../Common/common.h"
 #include "../NetMsg/netmsg.h"
+#pragma comment(lib, "Ws2_32.lib")
 
 MM_NAMESPACE_BEGIN
 
 
-struct __client_init_tag;
-typedef struct __client_init_tag	cliInit_t;
+
+typedef enum
+{
+		CLI_NOTIFY_ON_CONNECTED,
+		CLI_NOTIFY_ON_DISCONNECTED
+}cliNotifyType_t;
+
+typedef void (*cliNotifyFunc_t)(void *ctx, cliNotifyType_t t);
+
+
+typedef struct __client_init_tag
+{
+		void			*ctx;
+		cliNotifyFunc_t	on_notify;
+		HCURSOR			hide_cursor;
+}cliInit_t;
+
 
 bool_t Cli_Init(const cliInit_t *init);
 bool_t Cli_UnInit();
@@ -26,7 +42,9 @@ bool_t	Cli_InsertServer(nmPosition_t pos, const wchar_t *srv_ip, uint_16_t port)
 bool_t	Cli_RemoveServer(nmPosition_t pos);
 
 
+/****************************************Internal***************************/
 
+HCURSOR	Cli_GetHideCursor();
 
 
 

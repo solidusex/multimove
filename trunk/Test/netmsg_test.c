@@ -1,4 +1,6 @@
 
+#if(0)
+
 #define OEMRESOURCE
 
 
@@ -311,3 +313,8 @@ void NetMsg_Test()
 
 
 MM_NAMESPACE_END
+
+
+
+
+#endif
