@@ -466,17 +466,19 @@ static bool_t	__set_clipboard_data(const nmMsg_t *msg)
 
 		if(!OpenClipboard(NULL))
 		{
-				Com_error(COM_ERR_WARNING, L"OpenClipboard failed\r\n");
+				Com_error(COM_ERR_WARNING, L"OpenClipboard failed error code : %d\r\n", GetLastError());
 				is_ok = false;
 				goto END_POINT;
 		}
 
+		
 		if(!EmptyClipboard())
 		{
-				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed\r\n");
+				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed error code %d\r\n", GetLastError());
 				is_ok = false;
 				goto END_POINT;
 		}
+		
 
 
 		utf16 = Com_str_convto_wcs(COM_CP_UTF8, (const char*)msg->clip_data.data, msg->clip_data.length);
@@ -514,6 +516,8 @@ END_POINT:
 		CloseClipboard();
 		return is_ok;
 }
+
+
 
 bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 {
@@ -592,6 +596,12 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 		}
 				break;
 		case NM_MSG_CLIPDATA:
+				if(!ss->is_handshaked)
+				{
+						Com_error(COM_ERR_WARNING, L"Session (%s:%d) received NM_MSG_LEAVE request before handshake, package discard\r\n", ss->ip, ss->port);
+						is_ok = true;
+						goto END_POINT;
+				}
 				__set_clipboard_data(&msg);
 				break;
 		case NM_MSG_MOUSE:
