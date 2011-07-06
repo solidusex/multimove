@@ -321,7 +321,13 @@ bool_t	__on_window_notify(const nmMsg_t *msg)
 				switch(msg->t)
 				{
 				case NM_MSG_CLIPDATA:
-						ret = SS_SendClipDataMsg(__g_ss, msg);
+						if(SS_IsEntered(__g_ss))
+						{
+								ret = SS_SendClipDataMsg(__g_ss, msg);
+						}else
+						{
+								ret = true;
+						}
 						break;
 				default:
 						Com_ASSERT(false);
