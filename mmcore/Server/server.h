@@ -8,8 +8,37 @@
 MM_NAMESPACE_BEGIN
 
 
-struct __server_init_tag;
-typedef struct __server_init_tag	srvInit_t;
+
+
+typedef enum
+{
+		SRV_NOTIFY_ON_STARTUP,
+		SRV_NOTIFY_ON_LOGIN,
+		SRV_NOTIFY_ON_LOGOFF,
+		SRV_NOTIFY_ON_ENTER,
+		SRV_NOTIFY_ON_LEAVE,
+		SRV_NOTIFY_ON_CLIPBOARD_CHANGED,
+}srvNotifyType_t;
+
+
+typedef struct __server_notify_tag
+{
+		srvNotifyType_t	t;
+		
+		const wchar_t	*ip;
+		uint_16_t		port;
+}srvNotify_t;
+
+
+typedef void (*srvNotifyFunc_t)(void *ctx, const srvNotify_t	*notify);
+
+
+typedef struct __server_init_tag	
+{
+		void			*ctx;
+		srvNotifyFunc_t	on_notify;
+}srvInit_t;
+
 
 bool_t Srv_Init(const srvInit_t *init);
 bool_t Srv_UnInit();

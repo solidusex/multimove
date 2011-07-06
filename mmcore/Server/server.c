@@ -6,9 +6,18 @@
 MM_NAMESPACE_BEGIN
 
 
+static srvInit_t		__g_init = 
+{
+		NULL,
+		NULL
+};
+
+
 bool_t Srv_Init(const srvInit_t *init)
 {
-		Com_UNUSED(init);
+		Com_ASSERT(init != NULL);
+
+		__g_init = *init;
 		
 		return true;
 }
