@@ -5,6 +5,41 @@ MM_NAMESPACE_BEGIN
 
 #define MULTI_MOVE_WND_CLASS	TEXT("__MultiMoveWindowClass_Server__")
 
+#define WM_SET_CLIPBOARD_MSG	WM_USER + 1001
+
+
+
+typedef struct __set_clip_board_tag
+{
+		nmClipDataType_t		t;
+		byte_t					*data;
+		size_t					length;
+}setClipBoardPack_t;
+
+static setClipBoardPack_t*	CreateSetClipBoardPack(nmClipDataType_t	t,const byte_t	*data, size_t length)
+{
+		setClipBoardPack_t		*pack;
+		Com_ASSERT(data != NULL && length != NULL);
+		pack = Com_NEW0(setClipBoardPack_t);
+		pack->t = t;
+		pack->data = Com_NEWARR(byte_t, length);
+		Com_memcpy(pack->data, data, length);
+		pack->length = length;
+		return pack;
+}
+
+static void			DestroySetClipBoardPack(setClipBoardPack_t *pack)
+{
+		Com_ASSERT(pack != NULL);
+
+		if(pack->data)
+		{
+				Com_DEL(pack->data);
+		}
+		Com_DEL(pack);
+}
+
+
 
 
 
@@ -47,7 +82,7 @@ bool_t	WND_Srv_Start(wndMsgHander_t handler)
 
 bool_t	WND_Srv_Stop()
 {
-		if(WND_Srv_IsStarted())
+		if(!WND_Srv_IsStarted())
 		{
 				return false;
 		}
@@ -74,7 +109,31 @@ bool_t	WND_Srv_IsStarted()
 
 
 
+bool_t	WND_Srv_SetClipboardData(const nmMsg_t *msg)
+{
+		setClipBoardPack_t *pack;
+		Com_ASSERT(msg != NULL && msg->clip_data.data != NULL && msg->clip_data.length > 0);
 
+		if(!WND_Srv_IsStarted())
+		{
+				return false;
+		}
+
+		pack = CreateSetClipBoardPack(msg->clip_data.data_type, msg->clip_data.data, msg->clip_data.length);
+		
+		if(!PostMessage(__g_wnd, WM_SET_CLIPBOARD_MSG, (WPARAM)pack, NULL))
+		{
+				Com_error(COM_ERR_WARNING, L"WND_Srv_SetClipboardData failed error code : %d\r\n", GetLastError());
+				DestroySetClipBoardPack(pack);
+				pack = NULL;
+				return false;
+		}
+		return true;
+}
+
+
+
+/*********************************************************************************************************************/
 
 
 
@@ -86,8 +145,9 @@ static void window_thread(void *data)
 		WNDCLASSEX wcex;
 		MSG msg;
 		cmEvent_t *event;
+		HWND hwnd = NULL;
 		Com_ASSERT(data != NULL);
-
+		
 		event = (cmEvent_t*)data;
 
 
@@ -108,7 +168,7 @@ static void window_thread(void *data)
 		RegisterClassEx(&wcex);
 
 
-		__g_wnd = CreateWindow(
+		hwnd = CreateWindow(
 								MULTI_MOVE_WND_CLASS, 
 								MULTI_MOVE_WND_CLASS, 
 								WS_OVERLAPPEDWINDOW, 
@@ -122,13 +182,13 @@ static void window_thread(void *data)
 								NULL
 								);
 
-		if (!__g_wnd)
+		if (hwnd == NULL)
 		{
 				
 				Com_error(COM_ERR_FATAL, L"Create helper window failed\r\n");
 				return;
 		}
-
+		Com_ASSERT(__g_wnd != NULL);
 		ShowWindow(__g_wnd, SW_HIDE);
 		UpdateWindow(__g_wnd);
 
@@ -159,7 +219,7 @@ static bool	__on_clipboard_changed()
 		unixcontents = NULL;
 		contents = NULL;
 
-		if (!OpenClipboard(NULL))
+		if (!OpenClipboard(__g_wnd))
 		{
 				return false;
 		}
@@ -218,7 +278,7 @@ static bool	__on_clipboard_changed()
 		if(contents)
 		{
 				Com_DEL(contents);
-				unixcontents = NULL;
+				contents = NULL;
 		}
 
 		if(unixcontents)
@@ -240,6 +300,91 @@ static bool	__on_clipboard_changed()
 
 
 
+static bool_t	__set_clipboard_data(const setClipBoardPack_t *pack)
+{
+		wchar_t *utf16;
+		size_t l;
+		HGLOBAL hglb;
+		bool_t is_ok;
+
+		is_ok = true;
+		utf16 = NULL;
+		l = 0;
+		hglb = NULL;
+
+
+		if(!WND_Srv_IsStarted())
+		{
+				return false;
+		}
+		
+		if(pack->t != NM_CLIP_TEXT)
+		{
+				Com_error(COM_ERR_WARNING, L"Invalid Clipboard data type %d\r\n", pack->t);
+				is_ok = false;
+				goto END_POINT;
+		}
+		
+
+		
+		if(!OpenClipboard(__g_wnd))
+		{
+				Com_error(COM_ERR_WARNING, L"OpenClipboard failed error code : %d\r\n", GetLastError());
+				is_ok = false;
+				goto END_POINT;
+		}
+
+		
+		if(!EmptyClipboard())
+		{
+				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed error code %d\r\n", GetLastError());
+				is_ok = false;
+				goto END_POINT;
+		}
+		
+
+
+		utf16 = Com_str_convto_wcs(COM_CP_UTF8, (const char*)pack->data, pack->length);
+		if(utf16 == NULL)
+		{
+				Com_error(COM_ERR_WARNING, L"Invlaid clipboard data\r\n");
+				is_ok = false;
+				goto END_POINT;
+		}
+		
+		l = Com_wcslen(utf16);
+
+		if(l == 0)
+		{
+				Com_DEL(utf16);
+				is_ok = true;
+				goto END_POINT;
+		}
+
+		hglb = GlobalAlloc(GMEM_DDESHARE, (l +1) * sizeof(wchar_t));
+		if (hglb != NULL) 
+		{
+				wchar_t *dest = (wchar_t*) GlobalLock(hglb);
+				Com_wcscpy(dest, utf16);
+				GlobalUnlock(hglb);
+				SetClipboardData(CF_UNICODETEXT, hglb);
+		}
+
+END_POINT:
+		if(utf16)
+		{
+				Com_DEL(utf16);
+				utf16 = NULL;
+		}
+		CloseClipboard();
+
+
+		return is_ok;
+}
+
+
+
+
 static LRESULT CALLBACK window_proc(HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARAM lParam)
 {
 		switch (uMsg)
@@ -257,7 +402,16 @@ static LRESULT CALLBACK window_proc(HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARA
 				SendMessage(__g_next_clipboard, WM_DRAWCLIPBOARD , 0,0);
 				break;
 		case WM_CREATE:
+				__g_wnd = hwnd;
 				__g_next_clipboard = SetClipboardViewer(hwnd);
+				break;
+		case WM_SET_CLIPBOARD_MSG:
+		{
+				Com_ASSERT(wParam != NULL);
+				Com_printf(L"On WM_SET_CLIPBOARD_MSG\r\n");
+				__set_clipboard_data((const setClipBoardPack_t*)wParam);
+				DestroySetClipBoardPack((setClipBoardPack_t*)wParam);
+		}
 				break;
 		default:
 				return DefWindowProc(hwnd,uMsg,wParam,lParam);

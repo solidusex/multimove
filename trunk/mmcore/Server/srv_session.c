@@ -1,4 +1,5 @@
 
+#include "srv_wndsrv.h"
 #include "srv_session.h"
 
 
@@ -292,71 +293,6 @@ END_POINT:
 }
 
 
-static bool_t	__set_clipboard_data(const nmMsg_t *msg)
-{
-		wchar_t *utf16;
-		size_t l;
-		HGLOBAL hglb;
-		bool_t is_ok;
-
-		is_ok = true;
-		utf16 = NULL;
-		l = 0;
-		hglb = NULL;
-
-		if(!OpenClipboard(NULL))
-		{
-				Com_error(COM_ERR_WARNING, L"OpenClipboard failed error code : %d\r\n", GetLastError());
-				is_ok = false;
-				goto END_POINT;
-		}
-
-		
-		if(!EmptyClipboard())
-		{
-				Com_error(COM_ERR_WARNING, L"EmptyClipboard failed error code %d\r\n", GetLastError());
-				is_ok = false;
-				goto END_POINT;
-		}
-		
-
-
-		utf16 = Com_str_convto_wcs(COM_CP_UTF8, (const char*)msg->clip_data.data, msg->clip_data.length);
-		if(utf16 == NULL)
-		{
-				Com_error(COM_ERR_WARNING, L"Invlaid clipboard data\r\n");
-				is_ok = false;
-				goto END_POINT;
-		}
-		
-		l = Com_wcslen(utf16);
-
-		if(l == 0)
-		{
-				Com_DEL(utf16);
-				is_ok = true;
-				goto END_POINT;
-		}
-
-		hglb = GlobalAlloc(GMEM_DDESHARE, (l +1) * sizeof(wchar_t));
-		if (hglb != NULL) 
-		{
-				wchar_t *dest = (wchar_t*) GlobalLock(hglb);
-				Com_wcscpy(dest, utf16);
-				GlobalUnlock(hglb);
-				SetClipboardData(CF_UNICODETEXT, hglb);
-		}
-
-END_POINT:
-		if(utf16)
-		{
-				Com_DEL(utf16);
-				utf16 = NULL;
-		}
-		CloseClipboard();
-		return is_ok;
-}
-
 
 bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 {
@@ -594,7 +530,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 						goto END_POINT;
 				}
 				
-				__set_clipboard_data(&msg);
+				WND_Srv_SetClipboardData(&msg);
 				break;
 		case NM_MSG_HANDSHAKE_REPLY:
 		case NM_MSG_LEAVE:
