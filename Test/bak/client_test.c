@@ -2,9 +2,8 @@
 
 #include "test.h"
 
-#if(1)
-#include "Client/client.h"
-#pragma comment(lib, "Client.lib")
+
+
 
 
 void Client_Test()
@@ -28,4 +27,3 @@ void Client_Test()
 		Cli_UnInit();
 }
 
-#endif
