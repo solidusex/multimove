@@ -6,7 +6,7 @@
 MM_NAMESPACE_BEGIN
 
 
-static srvInit_t		__g_init = 
+static srvInit_t		__g_srv_init = 
 {
 		NULL,
 		NULL
@@ -17,7 +17,7 @@ bool_t Srv_Init(const srvInit_t *init)
 {
 		Com_ASSERT(init != NULL);
 
-		__g_init = *init;
+		__g_srv_init = *init;
 		
 		return true;
 }
@@ -25,11 +25,23 @@ bool_t Srv_Init(const srvInit_t *init)
 
 bool_t Srv_UnInit()
 {
+		Com_memset(&__g_srv_init, 0, sizeof(__g_srv_init));
 		return true;
 }
 
 
+bool_t	Srv_OnNotify(const srvNotify_t *notify)
+{
+		Com_ASSERT(notify != NULL);
 
+		if(__g_srv_init.on_notify != NULL)
+		{
+				__g_srv_init.on_notify(__g_srv_init.ctx, notify);
+				return true;
+		}
+
+		return false;
+}
 
 
 
@@ -54,8 +66,31 @@ static bool_t	mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu
 static void		server_io_thread_func(void *data);
 
 
+static bool_t	__send_listen_notify(bool_t is_any, const wchar_t *bind_ip, uint_16_t port)
+{
+		srvNotify_t		notify;
+		Com_memset(&notify, 0, sizeof(notify));
+		notify.t = SRV_NOTIFY_ON_LISTEN;
+		notify.on_listen.listen_port = port;
+
+		if(!is_any)
+		{
+				notify.on_listen.bind_ip[0].ip = bind_ip;
+				notify.on_listen.bind_ip_cnt = 1;
+		}else
+		{
+				/*Ã¶¾ÙÍø¿¨*/
+		}
+
+		Srv_OnNotify(&notify);
+
+		return true;
+}
+
 bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 {
+		bool_t	is_any_addr;
+
 		struct sockaddr_in addr;
 		SOCKET fd;
 		Com_memset(&addr, 0, sizeof(addr));
@@ -65,6 +100,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 				addr.sin_family = AF_INET;
 				addr.sin_addr.s_addr = INADDR_ANY;
 				Com_printf(L"Server bind any address\r\n");
+				is_any_addr = true;
 		}else
 		{
 				if(!Com_GetIPByHostName_V4(bind_ip, &addr))
@@ -72,6 +108,8 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 						Com_error(COM_ERR_WARNING, L"Can't get ip host information from %s\r\n", bind_ip);
 						return false;
 				}
+
+				is_any_addr = false;
 		}
 
 		addr.sin_port = htons(port);
@@ -91,6 +129,9 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 				Com_error(COM_ERR_WARNING, L"Server can not bind socket to address %s:%d : error code = %d\r\n", bind_ip == NULL ?  L"Any" : bind_ip, port, WSAGetLastError());
 				return false;
 		}
+
+		/*notify for ui or console*/
+		__send_listen_notify(is_any_addr, bind_ip, port);
 
 
 		Com_InitMutex(&__g_ss_lock);

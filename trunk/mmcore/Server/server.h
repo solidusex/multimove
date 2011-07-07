@@ -12,7 +12,7 @@ MM_NAMESPACE_BEGIN
 
 typedef enum
 {
-		SRV_NOTIFY_ON_STARTUP,
+		SRV_NOTIFY_ON_LISTEN,
 		SRV_NOTIFY_ON_LOGIN,
 		SRV_NOTIFY_ON_LOGOFF,
 		SRV_NOTIFY_ON_ENTER,
@@ -21,12 +21,50 @@ typedef enum
 }srvNotifyType_t;
 
 
+#define SRV_MAX_NETWORK_INTERFACE_SUPPORT		20
+
+
 typedef struct __server_notify_tag
 {
 		srvNotifyType_t	t;
 		
-		const wchar_t	*ip;
-		uint_16_t		port;
+		union{
+				struct{
+						struct{
+								const wchar_t	*ip;
+						}bind_ip[SRV_MAX_NETWORK_INTERFACE_SUPPORT];
+						size_t			bind_ip_cnt;
+						uint_16_t		listen_port;
+				}on_listen;
+				
+				struct{
+						const wchar_t	*remote_ip;
+						uint_16_t		remote_port;
+				}on_login;
+
+
+				struct{
+						const wchar_t	*remote_ip;
+						uint_16_t		remote_port;
+				}on_logoff;
+
+
+				struct {
+						const wchar_t	*remote_ip;
+						uint_16_t		remote_port;
+				}on_enter;
+
+				struct {
+						const wchar_t	*remote_ip;
+						uint_16_t		remote_port;
+				}on_leave;
+
+				struct {
+						const wchar_t	*remote_ip;
+						uint_16_t		remote_port;
+				}on_clipboard_changed;
+		};
+
 }srvNotify_t;
 
 
@@ -49,7 +87,9 @@ bool_t	Srv_Stop();
 bool_t	Srv_IsStarted();
 
 
+/************************************Internal****************************/
 
+bool_t	Srv_OnNotify(const srvNotify_t *notify);
 
 
 
