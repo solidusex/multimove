@@ -21,8 +21,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\mmcore;"
+				AdditionalIncludeDirectories="..\..\..\..\mmcore;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;AR_SHARED_LIB"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -106,8 +106,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -131,7 +131,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\mmcore;"
+				AdditionalIncludeDirectories="..\..\..\..\mmcore;"
 				PreprocessorDefinitions="WIN64;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -190,8 +190,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -217,7 +217,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\..\mmcore;"
+				AdditionalIncludeDirectories="..\..\..\..\mmcore;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;AR_SHARED_LIB"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
@@ -276,8 +276,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\..\binary\$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="..\..\..\..\Temp\$(ProjectName)\$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -304,7 +304,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\..\..\mmcore;"
+				AdditionalIncludeDirectories="..\..\..\..\mmcore;"
 				PreprocessorDefinitions="WIN64;NDEBUG;_CONSOLE"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
@@ -367,35 +367,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\blank_cursor.cur"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\ClientTest\client_ClientTest.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\ClientTest\main.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\ClientTest\netmsg_ClientTest.c"
-			>
-		</File>
-		<File
-			RelativePath=".\resource.h"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\ClientTest\server_ClientTest.c"
-			>
-		</File>
-		<File
-			RelativePath="..\..\..\ClientTest\ClientTest.h"
-			>
-		</File>
-		<File
-			RelativePath=".\ClientTest.rc"
+			RelativePath="..\..\..\..\Test\ClientTest\main.cpp"
 			>
 		</File>
 	</Files>

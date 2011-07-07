@@ -5,12 +5,8 @@
 #include <assert.h>
 
 
-
-
-
-
-
-#include "test.h"
+#include "Client/client.h"
+#pragma comment(lib, "Client.lib")
 
 
 
@@ -43,17 +39,25 @@ int main(int argc, char **argv)
 		cmInit_t cm_init;
 		cm_init.io_ctx = ctx;
 
+		cliInit_t init;
+		init.ctx = NULL;
+		init.hide_cursor = NULL;
+		init.on_notify = NULL;
+
 		printf("current locale == %ls\r\n", setlocale(LC_ALL,NULL));
 
 		Com_Init(&cm_init);
-		
-		//Common_Test();
-		//Hook_Test();
-		//Server_Test();
-		//NetMsg_Test();
-		Client_Test();
-		
+		Cli_Init(&init);
 
+		Cli_Start();
+
+		Cli_InsertServer(NM_POS_RIGHT, L"192.168.1.124", 8412);
+
+		getchar();
+
+		Cli_Stop();
+
+		Cli_UnInit();
 		Com_UnInit();
 
 #if (WINVER >= 0x401)
