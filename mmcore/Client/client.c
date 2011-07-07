@@ -36,6 +36,20 @@ HCURSOR	Cli_GetHideCursor()
 		return __g_cli_init.hide_cursor;
 }
 
+bool_t	Cli_OnNotify(const cliNotify_t *notifiy)
+{
+		Com_ASSERT(notifiy != NULL);
+
+		if(__g_cli_init.on_notify != NULL)
+		{
+				__g_cli_init.on_notify(__g_cli_init.ctx, notifiy);
+				return true;
+		}else
+		{
+				return false;
+		}
+}
+
 /************************************************************************************************************************************/
 
 

@@ -61,7 +61,7 @@ bool_t	Cli_RemoveServer(nmPosition_t pos);
 /****************************************Internal***************************/
 
 HCURSOR	Cli_GetHideCursor();
-
+bool_t	Cli_OnNotify(const cliNotify_t *notfiy);
 
 
 MM_NAMESPACE_END
