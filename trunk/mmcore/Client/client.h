@@ -13,7 +13,8 @@ typedef enum
 {
 		CLI_NOTIFY_ON_CONNECTED,
 		CLI_NOTIFY_ON_DISCONNECTED,
-		CLI_NOTIFY_ON_ACTIVE
+		CLI_NOTIFY_ON_ACTIVE,
+		CLI_NOTIFY_ON_DEACTIVE
 }cliNotifyType_t;
 
 
@@ -28,7 +29,9 @@ typedef struct __client_notify_tag
 
 }cliNotify_t;
 
+
 typedef void (*cliNotifyFunc_t)(void *ctx, const cliNotify_t	*notify);
+
 
 
 typedef struct __client_init_tag
