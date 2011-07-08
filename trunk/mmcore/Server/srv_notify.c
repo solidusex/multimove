@@ -97,7 +97,7 @@ bool_t	Srv_NotifyOnEnter(const wchar_t *remote_ip, uint_16_t port)
 		srvNotify_t		notify;
 		Com_ASSERT(remote_ip != NULL);
 		Com_memset(&notify, 0, sizeof(notify));
-		notify.t = SRV_NOTIFY_ON_LOGIN;
+		notify.t = SRV_NOTIFY_ON_ENTER;
 		Com_wcscpy(notify.on_enter.remote_ip, remote_ip);
 		notify.on_enter.remote_port = port;
 		return Srv_OnNotify(&notify);
@@ -109,7 +109,7 @@ bool_t	Srv_NotifyOnLeave(const wchar_t *remote_ip, uint_16_t port)
 		srvNotify_t		notify;
 		Com_ASSERT(remote_ip != NULL);
 		Com_memset(&notify, 0, sizeof(notify));
-		notify.t = SRV_NOTIFY_ON_LOGIN;
+		notify.t = SRV_NOTIFY_ON_LEAVE;
 		Com_wcscpy(notify.on_leave.remote_ip, remote_ip);
 		notify.on_leave.remote_port = port;
 		return 	Srv_OnNotify(&notify);
@@ -121,7 +121,7 @@ bool_t	Srv_NotifyOnClipData(const wchar_t *remote_ip, uint_16_t port)
 		srvNotify_t		notify;
 		Com_ASSERT(remote_ip != NULL);
 		Com_memset(&notify, 0, sizeof(notify));
-		notify.t = SRV_NOTIFY_ON_LOGIN;
+		notify.t = SRV_NOTIFY_ON_CLIPDATA;
 		Com_wcscpy(notify.on_recv_clipdata.remote_ip, remote_ip);
 		notify.on_recv_clipdata.remote_port = port;
 		return Srv_OnNotify(&notify);
