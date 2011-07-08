@@ -61,7 +61,7 @@ void on_srv_notify(void *ctx, const srvNotify_t	*notify)
 				printf("%ls:%d Leave\r\n", notify->on_leave.remote_ip, notify->on_leave.remote_port);
 		}
 				break;
-		case SRV_NOTIFY_ON_CLIPBOARD_CHANGED:
+		case SRV_NOTIFY_ON_CLIPDATA:
 		{
 				printf("%ls:%d Received clipboard data\r\n", notify->on_recv_clipdata.remote_ip, notify->on_recv_clipdata.remote_port);
 		}
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
 		//Srv_Start(NULL, 8412);
 
-		if(!Srv_Start(L"192.168.1.121", 8412))
+		if(!Srv_Start(NULL, 8412))
 		{
 				abort();
 		}
