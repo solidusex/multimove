@@ -22,8 +22,8 @@ typedef enum
 
 
 #define SRV_MAX_NETWORK_INTERFACE_SUPPORT		20
-
-
+#define SRV_IP_LENGTH							32
+#define SRV_ADAPTER_DESC_LENGTH					256
 typedef struct __server_notify_tag
 {
 		srvNotifyType_t	t;
@@ -31,38 +31,38 @@ typedef struct __server_notify_tag
 		union{
 				struct{
 						struct{
-								const wchar_t	*ip;
+								wchar_t	ip[SRV_IP_LENGTH];
 						}bind_ip[SRV_MAX_NETWORK_INTERFACE_SUPPORT];
 						size_t			bind_ip_cnt;
 						uint_16_t		listen_port;
 				}on_listen;
 				
 				struct{
-						const wchar_t	*remote_ip;
+						wchar_t			remote_ip[SRV_IP_LENGTH];
 						uint_16_t		remote_port;
 				}on_login;
 
 
 				struct{
-						const wchar_t	*remote_ip;
+						wchar_t			remote_ip[SRV_IP_LENGTH];
 						uint_16_t		remote_port;
 				}on_logoff;
 
 
 				struct {
-						const wchar_t	*remote_ip;
+						wchar_t			remote_ip[SRV_IP_LENGTH];
 						uint_16_t		remote_port;
 				}on_enter;
 
 				struct {
-						const wchar_t	*remote_ip;
+						wchar_t			remote_ip[SRV_IP_LENGTH];
 						uint_16_t		remote_port;
 				}on_leave;
 
 				struct {
-						const wchar_t	*remote_ip;
+						wchar_t			remote_ip[SRV_IP_LENGTH];
 						uint_16_t		remote_port;
-				}on_clipboard_changed;
+				}on_recv_clipdata;
 		};
 
 }srvNotify_t;
@@ -89,11 +89,9 @@ bool_t	Srv_IsStarted();
 
 /************************************Internal****************************/
 
+
+
 bool_t	Srv_OnNotify(const srvNotify_t *notify);
-
-
-
-
 
 
 MM_NAMESPACE_END

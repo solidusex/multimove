@@ -58,7 +58,7 @@ static void	client_io_thread_func(void *data);
 static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx);
 
 static cmMutex_t		__g_ss_mtx;
-static cliSession_t				*__g_ss_set[NM_POS_MAX];
+static cliSession_t		*__g_ss_set[NM_POS_MAX];
 static cmThread_t		*__g_working_thread = NULL;
 static bool_t			__g_is_started = false;
 

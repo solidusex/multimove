@@ -1,9 +1,13 @@
 
 #include "srv_wndsrv.h"
 #include "srv_session.h"
-
+#include "srv_notify.h"
 
 MM_NAMESPACE_BEGIN
+
+
+
+
 
 
 
@@ -42,6 +46,7 @@ srvSession_t*	SS_OnClientSession(SOCKET cli_fd, const struct sockaddr_in *addr)
 
 
 		Com_printf(L"Client Login %s:%d\r\n", ss->ip, ss->port);
+		Srv_NotifyOnLogin(ss->ip, ss->port);
 
 		return ss;
 }
@@ -52,6 +57,7 @@ void			SS_CloseClientSession(srvSession_t *ss)
 
 		Com_ASSERT(ss != NULL);
 
+		Srv_NotifyOnLogoff(ss->ip, ss->port);
 		Com_printf(L"Client Logoff %s:%d\r\n", ss->ip, ss->port);
 				
 		Com_DestroyBuffer(ss->in_buf);
@@ -383,6 +389,8 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 				
 				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, x_pos, y_pos, 0, 0);
 				ss->is_entered = true;
+
+				Srv_NotifyOnEnter(ss->ip, ss->port);
 		}
 				break;
 		case NM_MSG_MOUSE:
@@ -449,6 +457,8 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 								leave_msg.leave.x = pt.x;
 								leave_msg.leave.y = pt.y;
 								SS_SendMouseLeave(ss, &leave_msg);
+
+								Srv_NotifyOnLeave(ss->ip, ss->port);
 						}
 				}
 				
@@ -529,6 +539,7 @@ bool_t			SS_OnPackage(srvSession_t		*ss, const byte_t *data, size_t len)
 				}
 				
 				WND_Srv_SetClipboardData(&msg);
+				Srv_NotifyOnClipData(ss->ip, ss->port);
 				break;
 		case NM_MSG_HANDSHAKE_REPLY:
 		case NM_MSG_LEAVE:
