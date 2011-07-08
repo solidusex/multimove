@@ -4,6 +4,7 @@
 #include "cli_wndsrv.h"
 #include "cli_session.h"
 #include "client.h"
+#include "cli_notify.h"
 
 MM_NAMESPACE_BEGIN
 
@@ -162,6 +163,8 @@ cliSession_t*		SS_ConnectSession(nmPosition_t	pos, const wchar_t			*ip, uint_16_
 		SS_SendHandShake(ss);
 		ss->is_active = false;
 		ss->is_handshaked = false;
+
+		Cli_OnNotifyConnected(pos, ss->ip, ss->port);
 		return ss;
 }
 
@@ -172,6 +175,8 @@ void			SS_CloseSession(cliSession_t *ss)
 {
 		Com_ASSERT(ss != NULL);
 		
+		Cli_OnNotifyDisConnected(ss->for_position, ss->ip, ss->port);
+
 		if(SS_IsActive(ss))
 		{
 				__show_cursor();
@@ -190,6 +195,8 @@ void			SS_CloseSession(cliSession_t *ss)
 		Com_UnInitMutex(&ss->out_lock);
 		Com_DEL(ss);
 		ss = NULL;
+
+		
 }
 
 
@@ -431,6 +438,7 @@ bool_t		SS_SendEnterMsg(cliSession_t *ss, const nmMsg_t *msg)
 		Com_UnLockMutex(&ss->out_lock);
 
 		__hide_cursor();
+		Cli_OnNotifyActive(ss->for_position, ss->ip, ss->port);
 
 		return true;
 }
@@ -553,6 +561,7 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 				}
 				mouse_event(MOUSEEVENTF_MOVE|MOUSEEVENTF_ABSOLUTE, mouse_pos_x, mouse_pos_y, 0, 0);
 				Hook_Cli_ControlReturn();
+				Cli_OnNotifyDeActive(ss->for_position, ss->ip, ss->port);
 
 		}
 				break;
@@ -568,6 +577,7 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 				}
 				
 				WND_Cli_SetClipboardData(ss->for_position, &msg);
+				Cli_OnNotifyClipData(ss->for_position, ss->ip, ss->port);
 
 		}
 				break;

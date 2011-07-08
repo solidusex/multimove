@@ -27,7 +27,50 @@ void __stdcall default_print(const wchar_t *msg, void *ctx)
 }
 
 
-
+void on_srv_notify(void *ctx, const srvNotify_t	*notify)
+{
+		switch(notify->t)
+		{
+		case SRV_NOTIFY_ON_LISTEN:
+		{
+				printf("on listen:\r\n");
+				for(size_t i = 0; i < notify->on_listen.bind_ip_cnt; ++i)
+				{
+						printf("%ls:%d\r\n", notify->on_listen.bind_ip[i].ip, notify->on_listen.listen_port);
+				}
+				printf("\r\n");
+		}
+				break;
+		case SRV_NOTIFY_ON_LOGIN:
+		{
+				printf("%ls:%d Login\r\n", notify->on_login.remote_ip, notify->on_login.remote_port);
+		}
+				break;
+		case SRV_NOTIFY_ON_LOGOFF:
+		{
+				printf("%ls:%d LogOff\r\n", notify->on_logoff.remote_ip, notify->on_logoff.remote_port);
+		}
+				break;
+		case SRV_NOTIFY_ON_ENTER:
+		{
+				printf("%ls:%d Enter\r\n", notify->on_enter.remote_ip, notify->on_enter.remote_port);
+		}
+				break;
+		case SRV_NOTIFY_ON_LEAVE:
+		{
+				printf("%ls:%d Leave\r\n", notify->on_leave.remote_ip, notify->on_leave.remote_port);
+		}
+				break;
+		case SRV_NOTIFY_ON_CLIPBOARD_CHANGED:
+		{
+				printf("%ls:%d Received clipboard data\r\n", notify->on_recv_clipdata.remote_ip, notify->on_recv_clipdata.remote_port);
+		}
+				break;
+		default:
+				Com_ASSERT(false);
+				break;
+		}
+}
 
 int main(int argc, char **argv)
 {
@@ -41,13 +84,18 @@ int main(int argc, char **argv)
 		
 		srvInit_t		init;
 		init.ctx = NULL;
-		init.on_notify = NULL;
+		init.on_notify = on_srv_notify;
 		printf("current locale == %ls\r\n", setlocale(LC_ALL,NULL));
 
 		Com_Init(&cm_init);
 		Srv_Init(&init);
 
-		Srv_Start(NULL, 8412);
+		//Srv_Start(NULL, 8412);
+
+		if(!Srv_Start(L"192.168.1.121", 8412))
+		{
+				abort();
+		}
 
 
 		getchar();

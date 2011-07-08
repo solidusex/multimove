@@ -14,23 +14,56 @@ typedef enum
 		CLI_NOTIFY_ON_CONNECTED,
 		CLI_NOTIFY_ON_DISCONNECTED,
 		CLI_NOTIFY_ON_ACTIVE,
-		CLI_NOTIFY_ON_DEACTIVE
+		CLI_NOTIFY_ON_DEACTIVE,
+		CLI_NOTIFY_ON_CLIPDATA
 }cliNotifyType_t;
 
+
+#define CLI_IP_LENGTH							32
 
 typedef struct __client_notify_tag
 {
 		cliNotifyType_t	t;
 
-		nmPosition_t	action_pos;
-		
-		const wchar_t	*ip;
-		uint_16_t		port;
+		union{
+				struct {
+						nmPosition_t	action_pos;
+						wchar_t			ip[CLI_IP_LENGTH];
+						uint_16_t		port;
+				}on_connected;
 
+				struct {
+						nmPosition_t	action_pos;
+						wchar_t			ip[CLI_IP_LENGTH];
+						uint_16_t		port;
+				}on_disconnected;
+
+				struct {
+						nmPosition_t	action_pos;
+						wchar_t			ip[CLI_IP_LENGTH];
+						uint_16_t		port;
+				}on_active;
+
+
+				struct {
+						nmPosition_t	action_pos;
+						wchar_t			ip[CLI_IP_LENGTH];
+						uint_16_t		port;
+				}on_deactive;
+
+				struct {
+						nmPosition_t	action_pos;
+						wchar_t			ip[CLI_IP_LENGTH];
+						uint_16_t		port;
+				}on_clipdata;
+		};
 }cliNotify_t;
 
 
 typedef void (*cliNotifyFunc_t)(void *ctx, const cliNotify_t	*notify);
+
+
+
 
 
 

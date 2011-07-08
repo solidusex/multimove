@@ -1,7 +1,10 @@
 
+
 #include "srv_wndsrv.h"
 #include "server.h"
 #include "srv_session.h"
+#include "srv_notify.h"
+
 
 MM_NAMESPACE_BEGIN
 
@@ -41,33 +44,6 @@ bool_t	Srv_OnNotify(const srvNotify_t *notify)
 
 		return false;
 }
-
-
-/**********************************************************************************************************************/
-
-
-static bool_t	__send_listen_notify(const wchar_t *bind_ip, uint_16_t port)
-{
-		srvNotify_t		notify;
-		Com_memset(&notify, 0, sizeof(notify));
-		notify.t = SRV_NOTIFY_ON_LISTEN;
-		notify.on_listen.listen_port = port;
-
-		if(bind_ip != NULL)
-		{
-				notify.on_listen.bind_ip[0].ip = bind_ip;
-				notify.on_listen.bind_ip_cnt = 1;
-		}else
-		{
-				/*Ã¶¾ÙÍø¿¨*/
-		}
-
-		Srv_OnNotify(&notify);
-
-		return true;
-}
-
-
 
 
 
@@ -137,7 +113,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 		}
 
 		/*notify for ui or console*/
-		__send_listen_notify(bind_ip, port);
+		Srv_NotifyOnListen(bind_ip, port);
 
 
 		Com_InitMutex(&__g_ss_lock);

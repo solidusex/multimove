@@ -19,7 +19,7 @@ typedef struct __set_clip_board_tag
 static setClipBoardPack_t*	CreateSetClipBoardPack(nmClipDataType_t	t,const byte_t	*data, size_t length)
 {
 		setClipBoardPack_t		*pack;
-		Com_ASSERT(data != NULL && length != NULL);
+		Com_ASSERT(data != NULL && length > 0);
 		pack = Com_NEW0(setClipBoardPack_t);
 		pack->t = t;
 		pack->data = Com_NEWARR(byte_t, length);
@@ -87,7 +87,7 @@ bool_t	WND_Srv_Stop()
 				return false;
 		}
 
-		SendMessage(__g_wnd, WM_CLOSE, NULL, NULL);
+		SendMessage(__g_wnd, WM_CLOSE, (WPARAM)NULL, (LPARAM)NULL);
 
 		Com_JoinThread(__g_worker_thread);
 		Com_CloseThread(__g_worker_thread);
@@ -121,7 +121,7 @@ bool_t	WND_Srv_SetClipboardData(const nmMsg_t *msg)
 
 		pack = CreateSetClipBoardPack(msg->clip_data.data_type, msg->clip_data.data, msg->clip_data.length);
 		
-		if(!PostMessage(__g_wnd, WM_SET_CLIPBOARD_MSG, (WPARAM)pack, NULL))
+		if(!PostMessage(__g_wnd, WM_SET_CLIPBOARD_MSG, (WPARAM)pack, (LPARAM)NULL))
 		{
 				Com_error(COM_ERR_WARNING, L"WND_Srv_SetClipboardData failed error code : %d\r\n", GetLastError());
 				DestroySetClipBoardPack(pack);
@@ -203,7 +203,7 @@ static void window_thread(void *data)
 }
 
 
-static bool	__on_clipboard_changed()
+static bool_t	__on_clipboard_changed()
 {
 
 		
@@ -396,7 +396,7 @@ static LRESULT CALLBACK window_proc(HWND hwnd,  UINT uMsg,  WPARAM wParam, LPARA
 				break;
 		case WM_SET_CLIPBOARD_MSG:
 		{
-				Com_ASSERT(wParam != NULL);
+				Com_ASSERT(wParam != (WPARAM)NULL);
 				Com_printf(L"On WM_SET_CLIPBOARD_MSG\r\n");
 				is_in_setclipboard_mode = true;
 				__set_clipboard_data((const setClipBoardPack_t*)wParam);

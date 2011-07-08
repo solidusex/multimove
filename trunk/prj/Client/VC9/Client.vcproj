@@ -439,6 +439,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\mmcore\Client\cli_notify.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mmcore\Client\cli_notify.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\mmcore\Client\cli_session.c"
 				>
 			</File>
