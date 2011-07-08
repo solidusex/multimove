@@ -4,7 +4,7 @@
 #include <locale.h>
 #include <assert.h>
 
-
+#include "resource.h"
 #include "Client/client.h"
 #pragma comment(lib, "Client.lib")
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
 		cliInit_t init;
 		init.ctx = NULL;
-		init.hide_cursor = NULL;
+		init.hide_cursor = ::LoadCursor(::GetModuleHandle(NULL), MAKEINTRESOURCE(IDC_CURSOR_BLANK));
 		init.on_notify = NULL;
 
 		printf("current locale == %ls\r\n", setlocale(LC_ALL,NULL));

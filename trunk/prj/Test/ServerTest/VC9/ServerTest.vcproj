@@ -367,7 +367,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\..\..\Test\ServerTest\srv_main.cpp"
+			RelativePath=".\srv_main.cpp"
 			>
 		</File>
 	</Files>

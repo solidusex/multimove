@@ -367,7 +367,19 @@
 	</References>
 	<Files>
 		<File
-			RelativePath="..\..\..\..\Test\ClientTest\cli_main.cpp"
+			RelativePath=".\blankcur.cur"
+			>
+		</File>
+		<File
+			RelativePath=".\cli_main.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\ClientTest.rc"
+			>
+		</File>
+		<File
+			RelativePath=".\resource.h"
 			>
 		</File>
 	</Files>

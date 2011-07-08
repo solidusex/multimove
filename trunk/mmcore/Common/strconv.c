@@ -324,7 +324,7 @@ size_t					Com_str_to_wcs(cmCodePage_t cp, const char *acp, size_t n, wchar_t *o
 				return 0;
 		}
 
-		if(MultiByteToWideChar(CP_ACP, 0, acp, (int)n, out, (int)out_len) == 0)
+		if(MultiByteToWideChar(win_cp, 0, acp, (int)n, out, (int)out_len) == 0)
 		{
 				return 0;
 		}else
@@ -352,7 +352,7 @@ size_t					Com_wcs_to_str(cmCodePage_t cp, const wchar_t *input, size_t n, char 
 				return 0;
 		}
 
-		if(WideCharToMultiByte(CP_ACP, 0, input, (int)n, out, (int)out_len, NULL, NULL) == 0)
+		if(WideCharToMultiByte(win_cp, 0, input, (int)n, out, (int)out_len, NULL, NULL) == 0)
 		{
 				return 0;
 		}else
@@ -383,7 +383,7 @@ char*					Com_wcs_convto_str(cmCodePage_t cp, const wchar_t *input, size_t in_n)
 
 				ret = Com_NEWARR(char, len + 1);
 
-				len = WideCharToMultiByte(CP_ACP, 0, input, n, ret, len, NULL, NULL);
+				len = WideCharToMultiByte(win_cp, 0, input, n, ret, len, NULL, NULL);
 				if(len == 0)
 				{
 						Com_DEL(ret);
@@ -418,7 +418,7 @@ wchar_t*				Com_str_convto_wcs(cmCodePage_t cp, const char *input, size_t in_n)
 
 				ret = Com_NEWARR(wchar_t, len + 1);
 
-				len = MultiByteToWideChar(CP_ACP, 0, input, (int)in_n, ret, len);
+				len = MultiByteToWideChar(win_cp, 0, input, (int)in_n, ret, len);
 				if(len == 0)
 				{
 						Com_DEL(ret);
