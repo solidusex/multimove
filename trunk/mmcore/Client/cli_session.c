@@ -567,7 +567,7 @@ bool_t		SS_HandleRecvBuffer(cliSession_t *ss, const byte_t *data, size_t length)
 				break;
 		case NM_MSG_CLIPDATA:
 		{
-				Com_printf(L"Session (%s:%d) received NM_MSG_CLIPDATA", ss->ip, ss->port);
+				Com_printf(L"Session (%s:%d) received NM_MSG_CLIPDATA\r\n", ss->ip, ss->port);
 				
 				if(!ss->is_handshaked)
 				{
