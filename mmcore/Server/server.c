@@ -5,7 +5,6 @@
 
 MM_NAMESPACE_BEGIN
 
-
 static srvInit_t		__g_srv_init = 
 {
 		NULL,
@@ -44,6 +43,34 @@ bool_t	Srv_OnNotify(const srvNotify_t *notify)
 }
 
 
+/**********************************************************************************************************************/
+
+
+static bool_t	__send_listen_notify(const wchar_t *bind_ip, uint_16_t port)
+{
+		srvNotify_t		notify;
+		Com_memset(&notify, 0, sizeof(notify));
+		notify.t = SRV_NOTIFY_ON_LISTEN;
+		notify.on_listen.listen_port = port;
+
+		if(bind_ip != NULL)
+		{
+				notify.on_listen.bind_ip[0].ip = bind_ip;
+				notify.on_listen.bind_ip_cnt = 1;
+		}else
+		{
+				/*Ã¶¾ÙÍø¿¨*/
+		}
+
+		Srv_OnNotify(&notify);
+
+		return true;
+}
+
+
+
+
+
 
 /*****************************************************************************************************************/
 
@@ -66,30 +93,12 @@ static bool_t	mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu
 static void		server_io_thread_func(void *data);
 
 
-static bool_t	__send_listen_notify(bool_t is_any, const wchar_t *bind_ip, uint_16_t port)
-{
-		srvNotify_t		notify;
-		Com_memset(&notify, 0, sizeof(notify));
-		notify.t = SRV_NOTIFY_ON_LISTEN;
-		notify.on_listen.listen_port = port;
 
-		if(!is_any)
-		{
-				notify.on_listen.bind_ip[0].ip = bind_ip;
-				notify.on_listen.bind_ip_cnt = 1;
-		}else
-		{
-				/*Ã¶¾ÙÍø¿¨*/
-		}
 
-		Srv_OnNotify(&notify);
 
-		return true;
-}
 
 bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 {
-		bool_t	is_any_addr;
 
 		struct sockaddr_in addr;
 		SOCKET fd;
@@ -100,7 +109,6 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 				addr.sin_family = AF_INET;
 				addr.sin_addr.s_addr = INADDR_ANY;
 				Com_printf(L"Server bind any address\r\n");
-				is_any_addr = true;
 		}else
 		{
 				if(!Com_GetIPByHostName_V4(bind_ip, &addr))
@@ -108,8 +116,6 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 						Com_error(COM_ERR_WARNING, L"Can't get ip host information from %s\r\n", bind_ip);
 						return false;
 				}
-
-				is_any_addr = false;
 		}
 
 		addr.sin_port = htons(port);
@@ -131,7 +137,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 		}
 
 		/*notify for ui or console*/
-		__send_listen_notify(is_any_addr, bind_ip, port);
+		__send_listen_notify(bind_ip, port);
 
 
 		Com_InitMutex(&__g_ss_lock);
@@ -394,87 +400,5 @@ bool_t	__on_window_notify(const nmMsg_t *msg)
 }
 
 
-
-
-#if(0)
-static bool_t mouse_event_handler(size_t msg_id, const MSLLHOOKSTRUCT *mouse_stu)
-{
-		bool_t is_ok;
-
-		int x_full_screen, y_full_screen;
-		
-
-		Com_ASSERT(mouse_stu != NULL);
-
-		if(msg_id == WM_MOUSEMOVE)
-		{
-				Com_printf(L"On MouseMove (%d:%d)\r\n", mouse_stu->pt.x, mouse_stu->pt.y);
-		}
-		
-		is_ok = true;
-		x_full_screen = GetSystemMetrics(SM_CXSCREEN);
-		y_full_screen = GetSystemMetrics(SM_CYSCREEN);
-
-		
-		Com_LockMutex(&__g_ss_lock);
-
-		if(__g_ss != NULL)
-		{
-				switch(msg_id)
-				{
-				case WM_MOUSEMOVE:
-				{
-						if(mouse_stu->pt.x <= 0 && __g_ss->pos == NM_POS_RIGHT)
-						{
-								
-								if(SS_IsEntered(__g_ss))
-								{
-										nmMsg_t msg;
-										msg.t = NM_MSG_LEAVE;
-										msg.leave.src_x_fullscreen = x_full_screen;
-										msg.leave.src_y_fullscreen = y_full_screen;
-										msg.leave.x = mouse_stu->pt.x;
-										msg.leave.y = mouse_stu->pt.y;
-
-										Com_printf(L"Send mouse leave to session (%s:%d) on point (%d:%d)", __g_ss->ip, __g_ss->port, mouse_stu->pt.x, mouse_stu->pt.y);
-										SS_SendMouseLeave(__g_ss, &msg);
-								}
-								is_ok = true;
-						}else if(mouse_stu->pt.x >= x_full_screen && __g_ss->pos == NM_POS_LEFT)
-						{
-								if(SS_IsEntered(__g_ss))
-								{
-										nmMsg_t msg;
-										msg.t = NM_MSG_LEAVE;
-										msg.leave.src_x_fullscreen = x_full_screen;
-										msg.leave.src_y_fullscreen = y_full_screen;
-										msg.leave.x = mouse_stu->pt.x;
-										msg.leave.y = mouse_stu->pt.y;
-
-										Com_printf(L"Send mouse leave to session (%s:%d) on point (%d:%d)", __g_ss->ip, __g_ss->port, mouse_stu->pt.x, mouse_stu->pt.y);
-										SS_SendMouseLeave(__g_ss, &msg);
-								}
-								is_ok = true;
-						}else
-						{
-								is_ok = true;
-						}
-				}
-						break;
-				case WM_LBUTTONDOWN:
-				case WM_LBUTTONUP:
-				case WM_MOUSEWHEEL:
-				case WM_MOUSEHWHEEL:
-				case WM_RBUTTONDOWN:
-				case WM_RBUTTONUP:
-				default:
-						is_ok = true;
-						break;
-				}
-		}
-		Com_UnLockMutex(&__g_ss_lock);
-		return is_ok;
-}
-#endif
 
 MM_NAMESPACE_END
