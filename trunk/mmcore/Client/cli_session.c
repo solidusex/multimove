@@ -231,7 +231,7 @@ bool_t		SS_SendData(cliSession_t *ss)		/*将out_buf数据用非阻塞方式发送出去*/
 
 		is_ok = true;
 
-		available = Com_GetBufferAvailable(ss->out_buf);
+		available = Com_MIN(Com_GetBufferAvailable(ss->out_buf), 4 * COM_KB);
 
 		if(available <= 0)
 		{
