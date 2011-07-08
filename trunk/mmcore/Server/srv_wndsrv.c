@@ -203,21 +203,19 @@ static void window_thread(void *data)
 }
 
 
-
 static bool	__on_clipboard_changed()
 {
-		size_t i,j;
+
+		
 		nmMsg_t msg;
 		HGLOBAL hglb = NULL;
 		
 		char *utf8;
 		const wchar_t* str;
-		wchar_t *unixcontents, *contents;
 		
 		str = NULL;
 		utf8 = NULL;
-		unixcontents = NULL;
-		contents = NULL;
+
 
 		if (!OpenClipboard(__g_wnd))
 		{
@@ -232,40 +230,27 @@ static bool	__on_clipboard_changed()
 				return false;
 		}
 		
-
 		str = (const wchar_t*) GlobalLock(hglb);
-		contents = Com_NEWARR0(wchar_t, Com_wcslen(str) + 1);
-		unixcontents = Com_NEWARR0(wchar_t, Com_wcslen(str) + 1);
-
-		wcscpy(contents,str);
-		str = NULL;
-		GlobalUnlock(hglb);
-		CloseClipboard(); 
-
-		// Translate to Unix-format lines before sending
 		
-		for (i = 0,j= 0; contents[i] != TEXT('\0'); i++)
-		{
-				if (contents[i] != TEXT('\x0d')) 
-				{
-						unixcontents[j++] = contents[i];
-				}
-		}
-		unixcontents[j] = TEXT('\0');
+		Com_printf(L"On Clipboard Data:\r\n\r\n%s\r\n\r\n", str);
 
-		Com_printf(L"On Clipboard Data:\r\n\r\n%s\r\n\r\n", unixcontents);
+		utf8 = Com_wcs_convto_str(COM_CP_UTF8, str, Com_wcslen(str));
+		
+		
+		
 
-		Com_memset(&msg, 0, sizeof(msg));
-		msg.t = NM_MSG_CLIPDATA;
-		msg.clip_data.data_type = NM_CLIP_TEXT;
-		utf8 = Com_wcs_convto_str(COM_CP_UTF8, unixcontents, Com_wcslen(unixcontents));
+		
+		
 
 		if(utf8 == NULL)
 		{
-				Com_error(COM_ERR_WARNING, L"invalid clipboard data %ls\r\n",unixcontents);
+				Com_error(COM_ERR_WARNING, L"invalid clipboard data %ls\r\n",str);
 
 		}else
 		{
+				Com_memset(&msg, 0, sizeof(msg));
+				msg.t = NM_MSG_CLIPDATA;
+				msg.clip_data.data_type = NM_CLIP_TEXT;
 				msg.clip_data.data = (const byte_t*)utf8;
 				msg.clip_data.length = Com_strlen(utf8);
 				
@@ -274,18 +259,11 @@ static bool	__on_clipboard_changed()
 						__g_handler(&msg);
 				}
 		}
-
-		if(contents)
-		{
-				Com_DEL(contents);
-				contents = NULL;
-		}
-
-		if(unixcontents)
-		{
-				Com_DEL(unixcontents);
-				unixcontents = NULL;
-		}
+		
+		str = NULL;
+		
+		GlobalUnlock(hglb);
+		CloseClipboard(); 
 
 		if(utf8)
 		{
@@ -295,6 +273,7 @@ static bool	__on_clipboard_changed()
 
 		return true;
 }
+
 
 
 
