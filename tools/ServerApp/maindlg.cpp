@@ -51,21 +51,6 @@ BOOL CMainDlg::OnIdle()
 }
 	
 
-LRESULT CMainDlg::OnMenuShow(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-		// TODO: Add your command handler code here
-		if (!IsWindowVisible())
-			ShowWindow(SW_SHOW);
-		// Restore if window if minimized
-		if (IsIconic())
-			ShowWindow(SW_RESTORE);
-		else
-			BringWindowToTop();
-		// Make this the active window
-		::SetForegroundWindow(m_hWnd);
-		return 0;
-}
-
 
 LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 	{
@@ -123,5 +108,30 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	{
 			// TODO: Add your command handler code here
 
+			return 0;
+	}
+
+	
+	LRESULT CMainDlg::OnMenuShow(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+	{
+			// TODO: Add your command handler code here
+			if (!IsWindowVisible())
+					ShowWindow(SW_SHOW);
+			// Restore if window if minimized
+			if (IsIconic())
+					ShowWindow(SW_RESTORE);
+			else
+					BringWindowToTop();
+			// Make this the active window
+			::SetForegroundWindow(m_hWnd);
+			return 0;
+	}
+
+
+
+	LRESULT CMainDlg::OnBnClickedButtonHide(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	{
+			// TODO: Add your control notification handler code here
+			ShowWindow(SW_HIDE);
 			return 0;
 	}

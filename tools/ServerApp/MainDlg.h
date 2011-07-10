@@ -38,6 +38,7 @@ public:
 		COMMAND_ID_HANDLER(ID_MENU_START, OnMenuStart)
 		COMMAND_ID_HANDLER(ID_MENU_STOP, OnMenuStop)
 		COMMAND_ID_HANDLER(ID_MENU_OPTION, OnMenuOption)
+		COMMAND_HANDLER(IDC_BUTTON_HIDE, BN_CLICKED, OnBnClickedButtonHide)
 		CHAIN_MSG_MAP(CTrayIconImpl<CMainDlg>)
 	END_MSG_MAP()
 
@@ -56,4 +57,5 @@ public:
 	LRESULT OnMenuStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnMenuStop(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnMenuOption(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnBnClickedButtonHide(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 };
