@@ -19,6 +19,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerTest", "..\..\Test\Se
 		{07325191-A3B8-44BD-B3F5-4EA631298899} = {07325191-A3B8-44BD-B3F5-4EA631298899}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerApp", "..\..\..\tools\ServerApp\ServerApp.vcproj", "{9352D2FE-1361-41BB-92E9-E3EF40FE0312}"
+	ProjectSection(ProjectDependencies) = postProject
+		{07325191-A3B8-44BD-B3F5-4EA631298899} = {07325191-A3B8-44BD-B3F5-4EA631298899}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -59,11 +64,20 @@ Global
 		{DE746646-D6E4-4CF4-993E-88730679DEFF}.Release|Win32.Build.0 = Release|Win32
 		{DE746646-D6E4-4CF4-993E-88730679DEFF}.Release|x64.ActiveCfg = Release|x64
 		{DE746646-D6E4-4CF4-993E-88730679DEFF}.Release|x64.Build.0 = Release|x64
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Debug|Win32.Build.0 = Debug|Win32
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Debug|x64.ActiveCfg = Debug|x64
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Debug|x64.Build.0 = Debug|x64
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Release|Win32.ActiveCfg = Release|Win32
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Release|Win32.Build.0 = Release|Win32
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Release|x64.ActiveCfg = Release|x64
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{9352D2FE-1361-41BB-92E9-E3EF40FE0312} = {06245E89-AE51-45E5-9B09-517CA1B5349F}
 		{DE746646-D6E4-4CF4-993E-88730679ABCD} = {EC97512D-F7E3-4C81-BD7D-E6E90768B855}
 		{DE746646-D6E4-4CF4-993E-88730679DEFF} = {EC97512D-F7E3-4C81-BD7D-E6E90768B855}
 	EndGlobalSection

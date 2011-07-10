@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
 		//Srv_Start(NULL, 8412);
 
-		if(!Srv_Start(NULL, 8412))
+		if(!Srv_Start(NULL,1068, 8500))
 		{
 				abort();
 		}

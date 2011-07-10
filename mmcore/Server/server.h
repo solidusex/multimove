@@ -105,7 +105,7 @@ bool_t Srv_Init(const srvInit_t *init);
 bool_t Srv_UnInit();
 
 
-bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port);
+bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end);
 bool_t	Srv_Stop();
 bool_t	Srv_IsStarted();
 

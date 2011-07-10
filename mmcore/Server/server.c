@@ -93,12 +93,15 @@ static void		server_io_thread_func(void *data);
 
 
 
-
-bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
+bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end)
 {
 
 		struct sockaddr_in addr;
 		SOCKET fd;
+		uint_16_t	port;
+		bool_t bind_ok;
+		Com_ASSERT(port_beg < port_end);
+
 		Com_memset(&addr, 0, sizeof(addr));
 
 		if(bind_ip == NULL)
@@ -114,8 +117,6 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 						return false;
 				}
 		}
-
-		addr.sin_port = htons(port);
 		
 		fd = socket(AF_INET, SOCK_STREAM, 0);
 		
@@ -125,7 +126,26 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 				return false;
 		}
 
-		if(bind(fd, (struct sockaddr*)&addr, sizeof(addr)) != 0 || listen(fd, 15) != 0)
+		bind_ok = false;
+
+		for(port = port_beg; !bind_ok && port <= port_end; ++port)
+		{
+				addr.sin_port = htons(port);
+		
+				if(bind(fd, (struct sockaddr*)&addr, sizeof(addr)) != 0)
+				{
+						if(WSAGetLastError() != WSAEADDRINUSE)
+						{
+								break;
+						}
+				}else
+				{
+						bind_ok = true;
+				}
+		}
+
+		
+		if(!bind_ok)
 		{
 				closesocket(fd);
 				fd = INVALID_SOCKET;
@@ -133,6 +153,13 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port)
 				return false;
 		}
 
+		if(listen(fd, 15) != 0)
+		{
+				closesocket(fd);
+				fd = INVALID_SOCKET;
+				Com_error(COM_ERR_WARNING, L"Server can not listen in address %s:%d : error code = %d\r\n", bind_ip == NULL ?  L"Any" : bind_ip, port, WSAGetLastError());
+		}
+		
 		/*notify for ui or console*/
 		Srv_NotifyOnListen(bind_ip, port);
 
