@@ -15,6 +15,3 @@ Srv_IsStarted
 
 
 
-
-NM_MsgToBuffer
-NM_ParseFromBuffer
