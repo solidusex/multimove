@@ -100,7 +100,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end)
 		SOCKET fd;
 		uint_16_t	port;
 		bool_t bind_ok;
-		Com_ASSERT(port_beg < port_end);
+		Com_ASSERT(port_beg <= port_end);
 
 		Com_memset(&addr, 0, sizeof(addr));
 
@@ -141,6 +141,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end)
 				}else
 				{
 						bind_ok = true;
+						break;
 				}
 		}
 
