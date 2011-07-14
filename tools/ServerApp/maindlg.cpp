@@ -67,6 +67,8 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 		
 		this->InstallIcon(_T("MultiMove Server"), hIconSmall, IDR_MENU_POPUP);
 		
+		UIEnable(ID_MENU_START, TRUE);
+		UIEnable(ID_MENU_STOP, FALSE);
 		//((CDialogImpl<CMainDlg>*)this)->ShowWindow(SW_HIDE);
 		return TRUE;
 	}
@@ -90,10 +92,13 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 			CloseDialog(wID);
 			return 0;
 	}
+
 	LRESULT CMainDlg::OnMenuStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{
 			// TODO: Add your command handler code here
 
+			UIEnable(ID_MENU_START, FALSE);
+			UIEnable(ID_MENU_STOP, TRUE);
 			return 0;
 	}
 
@@ -101,6 +106,8 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	{
 			// TODO: Add your command handler code here
 
+			UIEnable(ID_MENU_START, TRUE);
+			UIEnable(ID_MENU_STOP, FALSE);
 			return 0;
 	}
 
@@ -124,14 +131,53 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 					BringWindowToTop();
 			// Make this the active window
 			::SetForegroundWindow(m_hWnd);
+			this->RemoveIcon();
 			return 0;
 	}
 
 
-
-	LRESULT CMainDlg::OnBnClickedButtonHide(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+		
+	LRESULT CMainDlg::OnBnClickedButtonHide(UINT code, int id, HWND hwnd)
 	{
 			// TODO: Add your control notification handler code here
+			HICON hIconSmall = (HICON)::LoadImage(_Module.GetResourceInstance(), MAKEINTRESOURCE(IDR_MAINFRAME), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+			this->InstallIcon(_T("MultiMove Server"), hIconSmall, IDR_MENU_POPUP);
 			ShowWindow(SW_HIDE);
 			return 0;
+	}
+
+	
+	LRESULT CMainDlg::OnClose()
+	{
+			// TODO: Add your message handler code here and/or call default
+			return OnBnClickedButtonHide(BN_CLICKED, IDC_BUTTON_HIDE,NULL);
+	}
+	
+
+	LRESULT CMainDlg::OnSize(UINT nType, const CSize &size)
+	{
+			// TODO: Add your message handler code here and/or call default
+				switch(nType)
+				{
+				case SIZE_MINIMIZED:
+						return OnBnClickedButtonHide(BN_CLICKED, IDC_BUTTON_HIDE,NULL);
+						break;
+				case SIZE_MAXHIDE:
+				case SIZE_MAXIMIZED:
+				case SIZE_MAXSHOW:
+				case SIZE_RESTORED:
+				default:
+						break;
+				}
+				return 0;
+	}
+		
+
+
+	void CMainDlg::PrepareMenu(HMENU menu)
+	{
+			ATLASSERT(menu != NULL);
+			CMenuHandle m(menu);
+			m.EnableMenuItem(ID_MENU_START, MF_DISABLED);
+			m.Detach();
 	}

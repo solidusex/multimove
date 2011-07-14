@@ -24,9 +24,9 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnIdle();
 	void CloseDialog(int nVal);
-
-
+	virtual void PrepareMenu(HMENU menu);
 	BEGIN_UPDATE_UI_MAP(CMainDlg)
+
 	END_UPDATE_UI_MAP()
 
 
@@ -38,9 +38,13 @@ public:
 		COMMAND_ID_HANDLER(ID_MENU_START, OnMenuStart)
 		COMMAND_ID_HANDLER(ID_MENU_STOP, OnMenuStop)
 		COMMAND_ID_HANDLER(ID_MENU_OPTION, OnMenuOption)
-		COMMAND_HANDLER(IDC_BUTTON_HIDE, BN_CLICKED, OnBnClickedButtonHide)
+		COMMAND_HANDLER_EX(IDC_BUTTON_HIDE, BN_CLICKED, OnBnClickedButtonHide)
+		MSG_WM_SIZE(OnSize)
+		MSG_WM_CLOSE(OnClose)
 		CHAIN_MSG_MAP(CTrayIconImpl<CMainDlg>)
 	END_MSG_MAP()
+
+
 
 
 
@@ -57,5 +61,7 @@ public:
 	LRESULT OnMenuStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnMenuStop(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnMenuOption(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnBnClickedButtonHide(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnBnClickedButtonHide(UINT code, int id, HWND hwnd);
+	LRESULT OnClose();
+	LRESULT OnSize(UINT nType, const CSize &size);
 };

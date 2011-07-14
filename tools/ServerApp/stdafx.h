@@ -16,8 +16,13 @@
 		#define _CRT_SECURE_NO_WARNINGS	1
 #endif
 
+
+#include   <atlstr.h> 
+#define   _WTL_NO_CSTRING 
+
 #include <atlbase.h>
 #include <atlapp.h>
+#include <atlmisc.h>
 
 extern CAppModule _Module;
 
@@ -27,7 +32,8 @@ extern CAppModule _Module;
 #include <atlframe.h>
 #include <atlctrls.h>
 #include <atldlgs.h>
-
+#include <atlddx.h> 
+#include <atlcrack.h>
 
 
 #if defined _M_IX86
@@ -44,3 +50,5 @@ extern CAppModule _Module;
 #include "Server/server.h"
 #pragma comment(lib, "Server.lib")
 
+
+#pragma warning(disable : 4100)

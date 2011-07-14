@@ -65,6 +65,7 @@ public:
 			return false;
 		// Remove
 		m_nid.uFlags = 0;
+		m_bInstalled = false;
 		return Shell_NotifyIcon(NIM_DELETE, &m_nid) ? true : false;
 	}
 
@@ -85,10 +86,10 @@ public:
 	inline void SetDefaultItem(UINT nID) { m_nDefault = nID; }
 
 	BEGIN_MSG_MAP(CTrayIcon)
-		MESSAGE_HANDLER(WM_TRAYICON, OnTrayIcon)
+			MESSAGE_HANDLER(WM_TRAYICON, OnTrayIcon)
 	END_MSG_MAP()
 
-	LRESULT OnTrayIcon(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
+	virtual LRESULT OnTrayIcon(UINT /*uMsg*/, WPARAM wParam, LPARAM lParam, BOOL& /*bHandled*/)
 	{
 		// Is this the ID we want?
 		if (wParam != m_nid.uID)
@@ -168,6 +169,11 @@ public:
 			lstrcpy(m_nid.szInfo,szMsg ? szMsg : _T(""));
 			lstrcpy(m_nid.szInfoTitle,szTitle ? szTitle : _T(""));
 			return Shell_NotifyIcon(NIM_MODIFY, &m_nid);
+	}
+
+	BOOL IsInstalled()const
+	{
+			return m_bInstalled;
 	}
 
 };
