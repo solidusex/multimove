@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{200a80e8-2799-432c-aa1b-d49ab460eb41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Server">
+      <UniqueIdentifier>{98261eee-b1e8-4d8a-87ee-4804ba0a7fdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetMsg">
+      <UniqueIdentifier>{03c9a894-52b6-428b-aa58-9d8b922e6e4b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\mmcore\Common\buffer.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\byteorder.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\common.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\iniobj.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\net.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\strconv.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\string.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\textfile.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\thread.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Server\server.c">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Server\srv_notify.c">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Server\srv_session.c">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Server\srv_wndsrv.c">
+      <Filter>Server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\NetMsg\netmsg.c">
+      <Filter>NetMsg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\mmcore\Common\common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Server\server.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Server\srv_notify.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Server\srv_session.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Server\srv_wndsrv.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\NetMsg\netmsg.h">
+      <Filter>NetMsg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="export.def" />
+  </ItemGroup>
+</Project>
