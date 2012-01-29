@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Common">
+      <UniqueIdentifier>{88487397-3a97-4da0-8566-804a0e3151bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client">
+      <UniqueIdentifier>{a5ecb307-baf0-4354-bd31-9ff0df2b73de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetMsg">
+      <UniqueIdentifier>{0844ae99-6520-4ec3-9e0d-65a88960195a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\mmcore\Common\buffer.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\byteorder.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\common.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\iniobj.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\net.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\strconv.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\string.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\textfile.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Common\thread.c">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Client\cli_hook.c">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Client\cli_notify.c">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Client\cli_session.c">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Client\cli_wndsrv.c">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\Client\client.c">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\mmcore\NetMsg\netmsg.c">
+      <Filter>NetMsg</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\mmcore\Common\common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Client\cli_hook.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Client\cli_notify.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Client\cli_session.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Client\cli_wndsrv.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\Client\client.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mmcore\NetMsg\netmsg.h">
+      <Filter>NetMsg</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="export.def" />
+  </ItemGroup>
+</Project>
