@@ -29,6 +29,8 @@ static cmInit_t	__g_com_init =
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 CMainDlg::CMainDlg()
 {
 		Com_Init(&__g_com_init);
@@ -36,6 +38,7 @@ CMainDlg::CMainDlg()
 
 CMainDlg::~CMainDlg()
 {
+
 		Com_UnInit();
 }
 
@@ -52,7 +55,18 @@ BOOL CMainDlg::OnIdle()
 	
 
 
-LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+BOOL CMainDlg::load_config()
+{
+		wchar_t buf[MAX_PATH];
+		wchar_t drv[3];
+
+		::GetModuleFileNameW(::GetModuleHandleW(NULL), buf, MAX_PATH);
+		//_wsplitpath(buf, drv, 
+
+		return TRUE;
+}
+
+LRESULT CMainDlg::OnInitDialog(HWND wParam, LPARAM lParam)
 	{
 		// center the dialog on the screen
 		CenterWindow();
@@ -70,10 +84,14 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 		UIEnable(ID_MENU_START, TRUE);
 		UIEnable(ID_MENU_STOP, FALSE);
 		//((CDialogImpl<CMainDlg>*)this)->ShowWindow(SW_HIDE);
+		
+
+		load_config();
+		
 		return TRUE;
 	}
 
-	LRESULT CMainDlg::OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	LRESULT CMainDlg::OnAppAbout(UINT uCode, int nCtrlID, HWND hwndCtrl)
 	{
 		CSimpleDialog<IDD_ABOUTBOX, FALSE> dlg;
 		dlg.DoModal();
@@ -87,13 +105,13 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	}
 
 
-	LRESULT CMainDlg::OnExit(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+	LRESULT CMainDlg::OnExit(UINT uCode, int nCtrlID, HWND hwndCtrl)
 	{
-			CloseDialog(wID);
+			CloseDialog(nCtrlID);
 			return 0;
 	}
 
-	LRESULT CMainDlg::OnMenuStart(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	LRESULT CMainDlg::OnMenuStart(UINT uCode, int nCtrlID, HWND hwndCtrl)
 	{
 			// TODO: Add your command handler code here
 
@@ -102,7 +120,7 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 			return 0;
 	}
 
-	LRESULT CMainDlg::OnMenuStop(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	LRESULT CMainDlg::OnMenuStop(UINT uCode, int nCtrlID, HWND hwndCtrl)
 	{
 			// TODO: Add your command handler code here
 
@@ -111,15 +129,14 @@ LRESULT CMainDlg::OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 			return 0;
 	}
 
-	LRESULT CMainDlg::OnMenuOption(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	LRESULT CMainDlg::OnMenuOption(UINT uCode, int nCtrlID, HWND hwndCtrl)
 	{
 			// TODO: Add your command handler code here
-
 			return 0;
 	}
 
 	
-	LRESULT CMainDlg::OnMenuShow(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled)
+	LRESULT CMainDlg::OnMenuShow(UINT uCode, int nCtrlID, HWND hwndCtrl)
 	{
 			// TODO: Add your command handler code here
 			if (!IsWindowVisible())
