@@ -362,10 +362,12 @@ uint_64_t		COM_BYTEFLIP_U64(uint_64_t val);
 #define Com_wcsncmp		wcsncmp
 #define Com_wcslen		wcslen
 #define Com_wcscpy		wcscpy
+#define Com_wcschr		wcschr
 #define Com_wcscat		wcscat
 #define Com_wcsstr		wcsstr
 #define Com_iswdigit	iswdigit
 #define Com_iswspace	iswspace
+#define Com_wcsncpy(_d, _s, _n)	wcsncpy((_d), (_s), (_n))
 
 char*	Com_strdup(const char *s);
 char*	Com_strndup(const char *sour, size_t len);
@@ -397,6 +399,9 @@ int_t		Com_swprintf(wchar_t *dest, size_t count, const wchar_t *fmt, ...);
 
 int_t		Com_vsprintf(char *dest, size_t count, const char *fmt, va_list args);
 int_t		Com_sprintf(char *dest, size_t count, const char *fmt, ...);
+
+
+
 
 /***********************************************StrConv************************************/
 
@@ -648,6 +653,50 @@ int Com_recv_timeout(SOCKET fd, char* buf, int len, int flags, const uint_64_t	*
 int Com_recv_all_timeout(SOCKET fd, char* buf, int len, int flags, int *bt, const uint_64_t *timeout);
 int Com_send_all_timeout(SOCKET fd, const char* buf, int len, int flags, int *bt, const uint_64_t *timeout);
 
+
+
+
+/**********************************************Ini Object****************************/
+
+
+struct __ini_object_tag;
+typedef struct __ini_object_tag iniObject_t;
+
+#define			INI_EMPTY_SECTION_NAME	L"[[__empty_header__]]"
+
+
+iniObject_t*	Ini_CreateObject();
+void			Ini_DestroyObject(iniObject_t *obj);
+void			Ini_ClearObject(iniObject_t *obj);
+
+bool_t			Ini_LoadObjectFromString(iniObject_t *obj, const wchar_t *ini_data);
+void			Ini_SaveObjectToString(const iniObject_t *obj, cmString_t *out);
+
+
+bool_t			Ini_SectionIsExisted(const iniObject_t *obj, const wchar_t *sect);
+bool_t			Ini_InsertSection(iniObject_t *obj, const wchar_t *sect, const wchar_t *comment);
+bool_t			Ini_RemoveSection(iniObject_t *obj, const wchar_t *sect);
+
+const wchar_t*	Ini_GetString(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key);
+bool_t			Ini_SetString(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, const wchar_t *val, const wchar_t *comment);
+
+bool_t			Ini_RemoveKey(iniObject_t *obj, const wchar_t *sect, const wchar_t *key);
+bool_t			Ini_SetComment(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, const wchar_t *comment);
+const wchar_t*	Ini_GetComment(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key);
+
+
+
+
+
+int_64_t		Ini_GetInt(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, int_64_t default_data);
+uint_64_t		Ini_GetUInt(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, uint_64_t default_data);
+double			Ini_GetUFloat(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double default_data);
+
+
+
+void			Ini_SetInt(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, int_64_t val, const wchar_t *comment);
+void			Ini_SetUInt(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, uint_64_t val, const wchar_t *comment);
+void			Ini_SetUFloat(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double val, const wchar_t *comment);
 
 
 
