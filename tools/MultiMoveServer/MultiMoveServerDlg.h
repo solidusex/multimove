@@ -7,6 +7,8 @@
 #include "afxcmn.h"
 
 
+
+
 // CMultiMoveServerDlg dialog
 class CMultiMoveServerDlg : public CDialogEx
 {
@@ -83,3 +85,5 @@ public:
 		CEdit m_log;
 		CEdit m_client_addr;
 };
+
+

@@ -85,10 +85,14 @@ int main(int argc, char **argv)
 		srvInit_t		init;
 		init.ctx = NULL;
 		init.on_notify = on_srv_notify;
+
 		printf("current locale == %ls\r\n", setlocale(LC_ALL,NULL));
 
-		Com_Init(&cm_init);
-		Srv_Init(&init);
+		serverInit_t	server_init;
+		server_init.cm_init = cm_init;
+		server_init.srv_init = init;
+		
+		Server_Init(&server_init);
 
 		//Srv_Start(NULL, 8412);
 
@@ -100,10 +104,7 @@ int main(int argc, char **argv)
 
 		getchar();
 
-		Srv_Stop();
-
-		Srv_UnInit();
-		Com_UnInit();
+		Server_UnInit();
 
 #if (WINVER >= 0x401)
 		#if defined(DEBUG_FLAG)
