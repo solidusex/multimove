@@ -46,6 +46,7 @@ public:
 
 		afx_msg void OnHideDlg();
 		afx_msg void OnShowDlg();
+		afx_msg void OnAbout();
 
 public:
 		void	AppendLog(const CString &str);
