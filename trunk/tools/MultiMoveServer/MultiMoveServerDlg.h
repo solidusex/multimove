@@ -45,6 +45,7 @@ private:
 public:
 		LRESULT OnShowTask(WPARAM wParam, LPARAM lParam);
 		LRESULT OnLogMsg(WPARAM wParam, LPARAM lParam);
+		LRESULT OnNotifyMsg(WPARAM wParam, LPARAM lParam);
 
 		afx_msg void OnHideDlg();
 		afx_msg void OnShowDlg();
