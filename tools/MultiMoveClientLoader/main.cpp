@@ -9,6 +9,23 @@
 
 
 
+#define MUTEX_NAME		L"2ED7BA57-3923-432A-B725-A1CAC76231C7"
+
+BOOL IsSameProcessRunning()
+{
+		HANDLE   mtx   =   CreateMutexW(0,   TRUE,   MUTEX_NAME); 
+
+		if(GetLastError()   ==   ERROR_ALREADY_EXISTS)   
+		{ 
+				ReleaseMutex(mtx); 
+				CloseHandle(mtx); 
+				return TRUE;
+		}else
+		{
+				return FALSE;
+		}
+}
+
 void UTIL_GetModulePath(wchar_t path[4096])
 {
 		static TCHAR buf[MAX_PATH * 2];
@@ -27,6 +44,11 @@ void UTIL_GetModulePath(wchar_t path[4096])
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    lpCmdLine, int       nCmdShow)
 {
+
+		if(IsSameProcessRunning())
+		{
+				return -1;
+		}
 
 		wchar_t path[4096];
 		UTIL_GetModulePath(path);
@@ -55,8 +77,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR    l
 				NULL, 
 				&si, 
 				&pi); 
-		
-		if(fRet) 
+
+		if(fRet)
 		{
 				::WaitForSingleObject(pi.hProcess, INFINITE);
 				//::MessageBoxW(NULL, L"AAA", L"AAA", 0);
