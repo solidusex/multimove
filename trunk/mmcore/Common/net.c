@@ -271,7 +271,10 @@ int Com_connect_timeout(SOCKET fd, const struct sockaddr* name, int namelen, con
 		}
 
 RESET_POINT:
-		ret = Com_socket_nonblocking(fd, false);
+		if(ret == 0)
+		{
+				ret = Com_socket_nonblocking(fd, false);
+		}
 
 		return ret;
 }
