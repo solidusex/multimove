@@ -897,6 +897,119 @@ RECHECK_POINT:
 }
 
 
+
+
+int_64_t		Ini_GetInt(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, int_64_t default_data)
+{
+		const wchar_t *s;
+		int_64_t num;
+		Com_ASSERT(obj != NULL && sect != NULL && key != NULL);
+
+		s = Ini_GetString(obj, sect, key);
+
+		if(s == NULL)
+		{
+				return default_data;
+		}
+
+
+		num = _wtoi64(s);
+
+		if(num == 0 && errno == EINVAL)
+		{
+				return default_data;
+		}else
+		{
+				return num;
+		}
+}
+
+uint_64_t		Ini_GetUInt(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, uint_64_t default_data)
+{
+		const wchar_t *s;
+		uint_64_t num;
+		Com_ASSERT(obj != NULL && sect != NULL && key != NULL);
+
+		s = Ini_GetString(obj, sect, key);
+
+		if(s == NULL)
+		{
+				return default_data;
+		}
+
+		num = (uint_64_t)_wtoi64(s);
+
+		if(num == 0 && errno == EINVAL)
+		{
+				return default_data;
+		}else
+		{
+				return num;
+		}
+
+}
+
+double			Ini_GetFloat(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double default_data)
+{
+		const wchar_t *s;
+		double num;
+		Com_ASSERT(obj != NULL && sect != NULL && key != NULL);
+
+		s = Ini_GetString(obj, sect, key);
+
+		if(s == NULL)
+		{
+				return default_data;
+		}
+
+
+		num = _wtof(s);
+
+		if(num == 0.0 && errno == EINVAL)
+		{
+				return default_data;
+		}else
+		{
+				return num;
+		}
+
+
+}
+
+
+void			Ini_SetInt(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, int_64_t val, const wchar_t *comment)
+{
+		wchar_t buf[128];
+		Com_ASSERT(obj != NULL && sect != NULL && key != NULL);
+
+		swprintf(buf, 128, L"%I64d", val);
+		
+		Ini_SetString(obj, sect, key, buf, comment);
+}
+
+void			Ini_SetUInt(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, uint_64_t val, const wchar_t *comment)
+{
+		wchar_t buf[128];
+		Com_ASSERT(obj != NULL && sect != NULL && key != NULL);
+
+		swprintf(buf, 128, L"%I64u", val);
+		
+		Ini_SetString(obj, sect, key, buf, comment);
+}
+
+
+void			Ini_SetFloat(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double val, const wchar_t *comment)
+{
+		wchar_t buf[128];
+		Com_ASSERT(obj != NULL && sect != NULL && key != NULL);
+
+		swprintf(buf, 128, L"%g", val);
+		Ini_SetString(obj, sect, key, buf, comment);
+}
+
+
+
+
 static bool_t	__handle_line(iniObject_t *obj, const wchar_t *line, int_t *last_sect_idx)
 {
 		bool_t	is_ok;
