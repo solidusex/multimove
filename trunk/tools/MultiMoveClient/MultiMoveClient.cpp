@@ -37,8 +37,34 @@ CMultiMoveClientApp theApp;
 
 // CMultiMoveClientApp initialization
 
+#define MUTEX_NAME		L"A038B7FF-735C-44F2-BA06-F23EEE541B3D"
+
+static BOOL IsSameProcessRunning()
+{
+		HANDLE   mtx   =   CreateMutexW(0,   TRUE,   MUTEX_NAME); 
+
+		if(GetLastError()   ==   ERROR_ALREADY_EXISTS)   
+		{ 
+				ReleaseMutex(mtx); 
+				CloseHandle(mtx); 
+				return TRUE;
+		}else
+		{
+				return FALSE;
+		}
+}
+
+
+
 BOOL CMultiMoveClientApp::InitInstance()
 {
+
+		if(IsSameProcessRunning())
+		{
+				return FALSE;
+		}
+
+
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
