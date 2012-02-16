@@ -42,63 +42,23 @@ static void	__stdcall error_func(int_t level, const wchar_t *msg, void *ctx)
 
 static void on_notify_func(void *ctx, const srvNotify_t	*notify)
 {
+
 		CMultiMoveServerDlg		*dlg = (CMultiMoveServerDlg*)ctx;
 		CString tmp;
 
-		assert(notify != NULL);
+		ASSERT(notify != NULL);
 
-		switch(notify->t)
+		if(notify)
 		{
-		case SRV_NOTIFY_ON_LISTEN:
-		{
-				
-				tmp.Append(TEXT("on listen:\r\n"));
-
-				for(size_t i = 0; i < notify->on_listen.bind_ip_cnt; ++i)
+				srvNotify_t *pnf = new srvNotify_t;
+				memcpy(pnf, notify, sizeof(*notify));
+				if(dlg)
 				{
-						tmp.AppendFormat(L"%ls:%d\r\n", notify->on_listen.bind_ip[i].ip, notify->on_listen.listen_port);
+						dlg->PostMessage(WM_NOTIFYMSG, (WPARAM)pnf);
 				}
-				tmp.AppendFormat(L"\r\n");
-		}
-				break;
-		case SRV_NOTIFY_ON_LOGIN:
-		{
-				tmp.AppendFormat(L"%ls:%d Login\r\n", notify->on_login.remote_ip, notify->on_login.remote_port);
-
-				CString addr_info;
-
-				addr_info.Format(TEXT("%s : %d"), notify->on_login.remote_ip, notify->on_login.remote_port);
-				dlg->OnClientConnected(addr_info);
-		}
-				break;
-		case SRV_NOTIFY_ON_LOGOFF:
-		{
-				tmp.AppendFormat(L"%ls:%d LogOff\r\n", notify->on_logoff.remote_ip, notify->on_logoff.remote_port);
-				dlg->OnClientConnected(TEXT("No client connected."));
-		}
-				break;
-		case SRV_NOTIFY_ON_ENTER:
-		{
-				tmp.AppendFormat(L"%ls:%d Enter\r\n", notify->on_enter.remote_ip, notify->on_enter.remote_port);
-		}
-				break;
-		case SRV_NOTIFY_ON_LEAVE:
-		{
-				tmp.AppendFormat(L"%ls:%d Leave\r\n", notify->on_leave.remote_ip, notify->on_leave.remote_port);
-		}
-				break;
-		case SRV_NOTIFY_ON_CLIPDATA:
-		{
-				tmp.AppendFormat(L"%ls:%d Received clipboard data\r\n", notify->on_recv_clipdata.remote_ip, notify->on_recv_clipdata.remote_port);
-		}
-				break;
-		default:
-				Com_ASSERT(false);
-				break;
 		}
 
-		CString *log = new CString(tmp);
-		dlg->PostMessage(WM_LOGMSG, (WPARAM)log);
+
 }
 
 
@@ -167,10 +127,15 @@ void CMultiMoveServerDlg::get_dlg_port_range(DWORD &beg, DWORD &end)const
 
 		m_srv_port_end.GetWindowText(tmp);
 		end = _wtoi64(tmp);
+
+		if(end < beg)
+		{
+				end = beg;
+		}
 }
 
 
-#define MM_SRV_CONFIG	TEXT("config.ini")
+#define MM_SRV_CONFIG	TEXT("server_config.ini")
 
 #define MM_SRV_CONFIG_SEC	TEXT("Server")
 #define MM_SRV_CONFIG_IP	TEXT("IP")
@@ -348,7 +313,7 @@ BEGIN_MESSAGE_MAP(CMultiMoveServerDlg, CDialogEx)
 
 	ON_MESSAGE(WM_SHOWTASK,OnShowTask)
 	ON_MESSAGE(WM_LOGMSG,OnLogMsg)
-	
+	ON_MESSAGE(WM_NOTIFYMSG, OnNotifyMsg)
 	
 	ON_WM_DESTROY()
 	ON_WM_SIZE()
@@ -589,6 +554,8 @@ LRESULT CMultiMoveServerDlg::OnShowTask(WPARAM wParam, LPARAM lParam)
 }
 
 
+
+
 LRESULT CMultiMoveServerDlg::OnLogMsg(WPARAM wParam, LPARAM lParam)
 {
 		CString *msg = (CString*)wParam;
@@ -748,4 +715,70 @@ void	CMultiMoveServerDlg::AppendLog(const CString &str)
 void	CMultiMoveServerDlg::OnClientConnected(const CString &addr_info)
 {
 		m_client_addr.SetWindowText(addr_info);
+}
+
+
+LRESULT CMultiMoveServerDlg::OnNotifyMsg(WPARAM wParam, LPARAM lParam)
+{
+		srvNotify_t *notify = (srvNotify_t*)wParam;
+		ASSERT(wParam != NULL);
+
+		CString tmp;
+		
+		switch(notify->t)
+		{
+		case SRV_NOTIFY_ON_LISTEN:
+		{
+				
+				tmp.Append(TEXT("on listen:\r\n"));
+
+				for(size_t i = 0; i < notify->on_listen.bind_ip_cnt; ++i)
+				{
+						tmp.AppendFormat(L"%ls:%d\r\n", notify->on_listen.bind_ip[i].ip, notify->on_listen.listen_port);
+				}
+				tmp.AppendFormat(L"\r\n");
+		}
+				break;
+		case SRV_NOTIFY_ON_LOGIN:
+		{
+				tmp.AppendFormat(L"%ls:%d Login\r\n", notify->on_login.remote_ip, notify->on_login.remote_port);
+
+				CString addr_info;
+
+				addr_info.Format(TEXT("%s : %d"), notify->on_login.remote_ip, notify->on_login.remote_port);
+				this->OnClientConnected(addr_info);
+		}
+				break;
+		case SRV_NOTIFY_ON_LOGOFF:
+		{
+				tmp.AppendFormat(L"%ls:%d LogOff\r\n", notify->on_logoff.remote_ip, notify->on_logoff.remote_port);
+				this->OnClientConnected(TEXT("No client connected."));
+		}
+				break;
+		case SRV_NOTIFY_ON_ENTER:
+		{
+				tmp.AppendFormat(L"%ls:%d Enter\r\n", notify->on_enter.remote_ip, notify->on_enter.remote_port);
+		}
+				break;
+		case SRV_NOTIFY_ON_LEAVE:
+		{
+				tmp.AppendFormat(L"%ls:%d Leave\r\n", notify->on_leave.remote_ip, notify->on_leave.remote_port);
+		}
+				break;
+		case SRV_NOTIFY_ON_CLIPDATA:
+		{
+				tmp.AppendFormat(L"%ls:%d Received clipboard data\r\n", notify->on_recv_clipdata.remote_ip, notify->on_recv_clipdata.remote_port);
+		}
+				break;
+		default:
+				Com_ASSERT(false);
+				break;
+		}
+
+		this->AppendLog(tmp);
+
+		delete notify;
+		notify = NULL;
+
+		return 0;
 }

@@ -426,11 +426,14 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="blankcur.cur" />
     <None Include="ReadMe.txt" />
+    <None Include="res\blankcur.cur" />
     <None Include="res\MultiMoveClient.ico" />
     <None Include="res\MultiMoveClient.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="MultiMoveClient.h" />
     <ClInclude Include="MultiMoveClientDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -438,6 +441,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="MultiMoveClient.cpp" />
     <ClCompile Include="MultiMoveClientDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

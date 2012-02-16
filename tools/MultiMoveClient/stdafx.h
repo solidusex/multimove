@@ -13,6 +13,9 @@
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
 
+
+#define  _CRT_SECURE_NO_WARNINGS		1
+
 #include "targetver.h"
 
 
@@ -39,11 +42,23 @@
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
 
-
+#include <string>
 
 
 #include "Client/client.h"
 #pragma comment(lib, "client.lib")
+
+
+
+
+#define	WM_SHOWTASK				(WM_USER + 1001)
+#define WM_LOGMSG				(WM_USER + 1002)
+#define WM_NOTIFYMSG			(WM_USER + 1003)
+
+#define	IDC_CUS_SHOW_DIALOG		9001
+#define	IDC_CUS_HIDE_DIALOG		9002
+#define IDC_CUS_SHOW_ABOUT		9003
+
 
 
 

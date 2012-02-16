@@ -22,6 +22,12 @@
     <None Include="res\MultiMoveClient.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="blankcur.cur">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\blankcur.cur">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MultiMoveClient.h">
@@ -39,6 +45,9 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AboutDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MultiMoveClientDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

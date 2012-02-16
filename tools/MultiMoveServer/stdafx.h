@@ -48,6 +48,7 @@
 
 #define	WM_SHOWTASK				(WM_USER + 1001)
 #define WM_LOGMSG				(WM_USER + 1002)
+#define WM_NOTIFYMSG			(WM_USER + 1003)
 
 #define	IDC_CUS_SHOW_DIALOG		9001
 #define	IDC_CUS_HIDE_DIALOG		9002
