@@ -101,8 +101,6 @@ typedef struct __server_init_tag
 }srvInit_t;
 
 
-bool_t Srv_Init(const srvInit_t *init);
-bool_t Srv_UnInit();
 
 
 bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end);
@@ -110,8 +108,25 @@ bool_t	Srv_Stop();
 bool_t	Srv_IsStarted();
 
 
+
+
+
+typedef struct __server_initialize_tag
+{
+		cmInit_t		cm_init;
+		srvInit_t		srv_init;
+}serverInit_t;
+
+
+bool_t	Server_Init(const serverInit_t *init);
+bool_t	Server_UnInit();
+
+
 /************************************Internal****************************/
 
+
+bool_t Srv_Init(const srvInit_t *init);
+bool_t Srv_UnInit();
 
 
 bool_t	Srv_OnNotify(const srvNotify_t *notify);

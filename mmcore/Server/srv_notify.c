@@ -44,7 +44,7 @@ bool_t	Srv_NotifyOnListen(const wchar_t *bind_ip, uint_16_t port)
 		}else
 		{
 				ULONG buf_size;
-				IP_ADAPTER_INFO *ptr;
+				IP_ADAPTER_INFO *ptr, *curr;
 				size_t i;
 				buf_size = 0;
 				ptr = NULL;
@@ -62,12 +62,14 @@ bool_t	Srv_NotifyOnListen(const wchar_t *bind_ip, uint_16_t port)
 				}
 				
 				i = 0;
-				while(ptr)
+
+				curr = ptr;
+				while(curr)
 				{
-						Com_swprintf(notify.on_listen.bind_ip[i].ip, SRV_IP_LENGTH, L"%S", ptr->IpAddressList.IpAddress.String);
+						Com_swprintf(notify.on_listen.bind_ip[i].ip, SRV_IP_LENGTH, L"%S", curr->IpAddressList.IpAddress.String);
 						notify.on_listen.bind_ip_cnt++;
 						i++;
-						ptr = ptr->Next;
+						curr = curr->Next;
 				}
 
 END_POINT:

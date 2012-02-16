@@ -114,6 +114,7 @@ THE SOFTWARE.
 
 #include <assert.h>
 #include <stdio.h>
+#include <errno.h>
 
 
 #pragma warning(disable : 4201)
@@ -690,13 +691,13 @@ const wchar_t*	Ini_GetComment(const iniObject_t *obj, const wchar_t *sect, const
 
 int_64_t		Ini_GetInt(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, int_64_t default_data);
 uint_64_t		Ini_GetUInt(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, uint_64_t default_data);
-double			Ini_GetUFloat(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double default_data);
+double			Ini_GetFloat(const iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double default_data);
 
 
 
 void			Ini_SetInt(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, int_64_t val, const wchar_t *comment);
 void			Ini_SetUInt(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, uint_64_t val, const wchar_t *comment);
-void			Ini_SetUFloat(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double val, const wchar_t *comment);
+void			Ini_SetFloat(iniObject_t *obj, const wchar_t *sect, const wchar_t *key, double val, const wchar_t *comment);
 
 
 

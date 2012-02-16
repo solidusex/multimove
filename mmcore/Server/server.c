@@ -100,8 +100,10 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end)
 		SOCKET fd;
 		uint_16_t	port;
 		bool_t bind_ok;
+		int last_error;
 		Com_ASSERT(port_beg <= port_end);
 
+		last_error = 0; 
 		Com_memset(&addr, 0, sizeof(addr));
 
 		if(bind_ip == NULL)
@@ -128,13 +130,15 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end)
 
 		bind_ok = false;
 
+		
 		for(port = port_beg; !bind_ok && port <= port_end; ++port)
 		{
 				addr.sin_port = htons(port);
 		
 				if(bind(fd, (struct sockaddr*)&addr, sizeof(addr)) != 0)
 				{
-						if(WSAGetLastError() != WSAEADDRINUSE)
+						last_error = WSAGetLastError();
+						if(last_error != WSAEADDRINUSE)
 						{
 								break;
 						}
@@ -150,7 +154,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end)
 		{
 				closesocket(fd);
 				fd = INVALID_SOCKET;
-				Com_error(COM_ERR_WARNING, L"Server can not bind socket to address %s:%d : error code = %d\r\n", bind_ip == NULL ?  L"Any" : bind_ip, port, WSAGetLastError());
+				Com_error(COM_ERR_WARNING, L"Server can not bind socket to address %s:%d : error code = %d\r\n", bind_ip == NULL ?  L"Any" : bind_ip, port, last_error);
 				return false;
 		}
 
@@ -424,6 +428,38 @@ bool_t	__on_window_notify(const nmMsg_t *msg)
 
 }
 
+
+bool_t	Server_Init(const serverInit_t *init)
+{
+		if(!Com_Init(&init->cm_init))
+		{
+				return false;
+		}
+
+		if(!Srv_Init(&init->srv_init))
+		{
+				Com_UnInit();
+				return false;
+		}
+
+		return true;
+
+}
+
+bool_t	Server_UnInit()
+{
+		
+		if(!Srv_UnInit())
+		{
+				return false;
+		}
+
+		if(!Com_UnInit())
+		{
+				return false;
+		}
+		return true;
+}
 
 
 MM_NAMESPACE_END
