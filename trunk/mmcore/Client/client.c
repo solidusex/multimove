@@ -474,6 +474,39 @@ static bool_t hook_dispatch(const nmMsg_t *msg, void *ctx)
 
 
 
+bool_t	Client_Init(const clientInit_t *init)
+{
+		Com_ASSERT(init != NULL);
+
+		if(!Com_Init(&init->cm_init))
+		{
+				return false;
+		}
+
+		if(!Cli_Init(&init->cli_init))
+		{
+				Com_UnInit();
+				return false;
+		}
+
+		return true;
+}
+
+bool_t	Client_UnInit()
+{
+		if(!Cli_UnInit())
+		{
+				return false;
+		}
+
+		if(!Com_UnInit())
+		{
+				return false;
+		}
+
+		return true;
+
+}
 
 
 /*************************************************************************/

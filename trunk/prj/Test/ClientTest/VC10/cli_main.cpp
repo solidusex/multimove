@@ -82,19 +82,25 @@ int main(int argc, char **argv)
 
 		printf("current locale == %ls\r\n", setlocale(LC_ALL,NULL));
 
-		Com_Init(&cm_init);
-		Cli_Init(&init);
+		clientInit_t client_init;
+		client_init.cm_init = cm_init;
+		client_init.cli_init = init;
+		
+		Client_Init(&client_init);
 
 		Cli_Start();
 
-		Cli_InsertServer(NM_POS_RIGHT, L"193.168.19.179", 8412);
+		if(!Cli_InsertServer(NM_POS_RIGHT, L"192.168.1.123", 8512))
+		{
+				abort();
+		}
 
 		getchar();
 
 		Cli_Stop();
 
-		Cli_UnInit();
-		Com_UnInit();
+		Client_UnInit();
+		
 
 #if (WINVER >= 0x401)
 		#if defined(DEBUG_FLAG)

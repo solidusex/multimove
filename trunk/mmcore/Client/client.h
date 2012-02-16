@@ -98,9 +98,6 @@ typedef struct __client_init_tag
 }cliInit_t;
 
 
-bool_t Cli_Init(const cliInit_t *init);
-bool_t Cli_UnInit();
-
 
 
 
@@ -114,7 +111,24 @@ bool_t	Cli_InsertServer(nmPosition_t pos, const wchar_t *srv_ip, uint_16_t port)
 bool_t	Cli_RemoveServer(nmPosition_t pos);
 
 
+typedef struct __client_initialize_tag
+{
+		cmInit_t		cm_init;
+		cliInit_t		cli_init;
+}clientInit_t;
+
+bool_t	Client_Init(const clientInit_t *init);
+bool_t	Client_UnInit();
+
+
 /****************************************Internal***************************/
+
+
+bool_t Cli_Init(const cliInit_t *init);
+bool_t Cli_UnInit();
+
+
+
 
 HCURSOR	Cli_GetHideCursor();
 bool_t	Cli_OnNotify(const cliNotify_t *notfiy);

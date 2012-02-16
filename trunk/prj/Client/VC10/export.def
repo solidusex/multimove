@@ -3,6 +3,41 @@ EXPORTS
 
 
 ;Common
+
+
+Com_printf
+Com_error
+
+COM_BYTEFLIP_16
+COM_BYTEFLIP_U16
+COM_BYTEFLIP_32
+COM_BYTEFLIP_U32
+COM_BYTEFLIP_64
+COM_BYTEFLIP_U64
+
+
+Com_CreateString
+Com_DestroyString
+Com_GetStrString
+Com_GetLengthString
+Com_ReserveString
+Com_ClearString
+Com_AppendString
+Com_FormatString
+Com_AppendFormatString
+Com_VFormatString
+Com_AppendVFormatString
+Com_AppendCharToString
+
+
+
+
+Com_SaveBomTextFile
+Com_LoadBomTextFile
+
+
+
+
 Ini_CreateObject
 Ini_DestroyObject
 Ini_ClearObject
@@ -20,13 +55,31 @@ Ini_GetComment
 
 
 
+Ini_GetInt
+Ini_GetUInt
+Ini_GetFloat
 
-Com_Init
-Com_UnInit
 
 
-Cli_Init
-Cli_UnInit
+Ini_SetInt
+Ini_SetUInt
+Ini_SetFloat
+
+
+Com_str_to_wcs
+Com_wcs_to_str
+Com_wcs_convto_str
+Com_str_convto_wcs
+
+
+
+
+
+
+
+Client_Init
+Client_UnInit
+
 Cli_Start
 Cli_Stop
 Cli_InsertServer

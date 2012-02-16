@@ -109,7 +109,7 @@ bool_t	Srv_NotifyOnLogoff(const wchar_t *remote_ip, uint_16_t port)
 		srvNotify_t		notify;
 		Com_ASSERT(remote_ip != NULL);
 		Com_memset(&notify, 0, sizeof(notify));
-		notify.t = SRV_NOTIFY_ON_LOGIN;
+		notify.t = SRV_NOTIFY_ON_LOGOFF;
 		Com_wcscpy(notify.on_logoff.remote_ip, remote_ip);
 		notify.on_logoff.remote_port = port;
 		return Srv_OnNotify(&notify);
