@@ -344,6 +344,8 @@ BEGIN_MESSAGE_MAP(CMultiMoveServerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_CUS_SHOW_DIALOG, &CMultiMoveServerDlg::OnShowDlg)
 	ON_BN_CLICKED(IDC_CUS_HIDE_DIALOG, &CMultiMoveServerDlg::OnHideDlg)
 	
+	ON_BN_CLICKED(IDC_CUS_SHOW_ABOUT, &CMultiMoveServerDlg::OnAbout)
+
 	ON_MESSAGE(WM_SHOWTASK,OnShowTask)
 	ON_MESSAGE(WM_LOGMSG,OnLogMsg)
 	
@@ -524,6 +526,12 @@ void CMultiMoveServerDlg::OnHideDlg()
 		
 }
 
+void CMultiMoveServerDlg::OnAbout()
+{
+		CAboutDlg dlgAbout;
+		dlgAbout.DoModal();
+}
+
 
 LRESULT CMultiMoveServerDlg::OnShowTask(WPARAM wParam, LPARAM lParam)
 {
@@ -541,6 +549,10 @@ LRESULT CMultiMoveServerDlg::OnShowTask(WPARAM wParam, LPARAM lParam)
 				CMenu menu;
 				menu.CreatePopupMenu();                   //声明一个弹出式菜单
 
+
+				
+				menu.AppendMenu(MF_STRING, IDC_CUS_SHOW_ABOUT, TEXT("About"));
+				menu.AppendMenu(MF_SEPARATOR);
 
 				menu.AppendMenu(MF_STRING, IDC_BUTTON_SRVSTART, TEXT("Start"));
 				menu.AppendMenu(MF_STRING, IDC_BUTTON_SRVSTOP, TEXT("Stop"));

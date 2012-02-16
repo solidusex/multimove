@@ -51,7 +51,7 @@
 
 #define	IDC_CUS_SHOW_DIALOG		9001
 #define	IDC_CUS_HIDE_DIALOG		9002
-
+#define IDC_CUS_SHOW_ABOUT		9003
 
 
 
