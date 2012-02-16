@@ -408,7 +408,7 @@ void	CMultiMoveClientDlg::init_client()
 
 		cliInit_t init;
 		init.ctx = (void*)this;
-		init.hide_cursor = NULL;// ::LoadCursor(::GetModuleHandle(NULL), MAKEINTRESOURCE(IDC_CURSOR_BLANK));
+		init.hide_cursor =  ::LoadCursor(::GetModuleHandle(NULL), MAKEINTRESOURCE(IDC_CURSOR_BLANK));
 		init.on_notify = __client_notify;
 
 

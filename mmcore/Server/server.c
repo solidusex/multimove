@@ -158,7 +158,7 @@ bool_t	Srv_Start(const wchar_t *bind_ip, uint_16_t port_beg, uint_16_t port_end)
 				return false;
 		}
 
-		if(listen(fd, 15) != 0)
+		if(listen(fd, 0) != 0)
 		{
 				closesocket(fd);
 				fd = INVALID_SOCKET;
